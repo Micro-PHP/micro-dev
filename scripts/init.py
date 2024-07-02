@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import os, git, logging
+import os, gitdb, logging
 
 from exceptions import MissingBranchError
 from packages import read_packages
@@ -26,10 +26,10 @@ def change_directory(func):
 @change_directory
 def init_repository(package_folder, package_repo):
     try:
-        repository = git.Repo('.')
-    except git.exc.InvalidGitRepositoryError:
+        repository = gitdb.Repo('.')
+    except gitdb.exc.InvalidGitRepositoryError:
         logging.info(f'Initializing git repository in {package_folder}')
-        repository = git.Repo.init('.')
+        repository = gitdb.Repo.init('.')
     if 'origin' not in repository.remotes:
         logging.info(f'Adding remote origin {package_repo} to {package_folder}')
         repository.create_remote('origin', package_repo)
@@ -59,7 +59,7 @@ def checkout(repository, branch):
     try:
         logging.info(f'Checking out branch {branch} in {package_name}')
         repository.git.checkout('-f', branch)
-    except git.exc.GitCommandError:
+    except gitdb.exc.GitCommandError:
         logging.info(f'Branch {branch} does not exist in {package_name}')
         raise MissingBranchError(f'Branch {branch} does not exist in {package_name}')
 
