@@ -14,8 +14,8 @@ venv/touchfile: scripts/requirements.txt
 	cd ./scripts; . venv/bin/activate; $(PIP) install -Ur requirements.txt
 	cd ./scripts; touch venv/touchfile
 
-init: venv ## Initializes the sub-repositories for build system
-	cd ./scripts; . venv/bin/activate; $(PYTHON) ./init.py
+init: ## Initializes the sub-repositories for build system
+	cd ./scripts; . venv/bin/activate; $(PYTHON) ./init.py --config=../repository.json
 
 release-prepare: ## Prepares releases
 	cd ./scripts; . venv/bin/activate; $(PYTHON) ./release.py "$(RELEASE_NAME)"
@@ -24,5 +24,5 @@ release-merge: ## Merges releases in GitHub
 	cd ./scripts; . venv/bin/activate; $(PYTHON) ./release.py "$(RELEASE_NAME)" --merge
 
 clean: ## Clean the build system
-	cd ./scripts; rm -rf venv
+	cd ./scripts; rm -rf venv __pycache__
 	cd ./scripts; find -iname "*.pyc" -delete

@@ -1,11 +1,13 @@
-import logging, subprocess
+import os, logging, subprocess
 
 
 def execute_shell_command(cmd, cwd=None, capture_output=False):
+    if cwd is None:
+        cwd = os.getcwd()
     logging.info(f'Running a command:"{cmd}" in a working directory {cwd}')
-    if cmd != 'git branch --show-current':
-        return
     try:
+        if cmd != 'git branch --show-current':
+            return
         result = subprocess.run(cmd, check=True, cwd=cwd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         if capture_output:
             return result.stdout.strip()  # Return the stdout if capture_output is True
