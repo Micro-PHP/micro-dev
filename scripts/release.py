@@ -7,44 +7,9 @@ from git import Repo, InvalidGitRepositoryError
 from github import create_merge_request, merge_pr, create_release, check_for_open_prs
 from git_shell import get_current_git_branch, PackageBranchExistError
 from packages import read_packages
+from git_commands import create_or_update_branch, get_repository, commit_changes, push_changes
 
 logging.basicConfig(level=logging.INFO)
-
-def fetch(func):
-    def wrapper(repository: Repo, package: str, *args, **kwargs):
-        logging.info(f'Fetching from remote origin {repository.remotes.origin.url} to {package}')
-        repository.git.fetch()
-        return func(repository, package, *args, **kwargs)
-    return wrapper
-
-@fetch
-def create_or_update_branch(repository: Repo, package: str, branch_name: str):
-    if branch_name in repository.heads:
-        logging.info(f'Branch {branch_name} exists.')
-        if repository.active_branch.name != branch_name:
-            raise NameError(f'Branch {branch_name} already exists but is not active.')
-        logging.info(f"Repository is already on branch '{branch_name}'")
-    else:
-        repository.create_head(branch_name)
-
-def commit_changes(repository: Repo, release_name: str, package: str):
-    untracked_files = repository.untracked_files
-    unstaged_files = [item.a_path for item in repository.index.diff(None)]
-    staged_files = [item.a_path for item in repository.index.diff('HEAD')]
-    all_files_to_add = untracked_files + unstaged_files + staged_files
-    if not all_files_to_add:
-        logging.info('No changes to commit.')
-        return
-    repository.index.add(all_files_to_add)
-    repository.index.commit(f'Update {release_name} for {package}')
-
-def push_changes(repository: Repo):
-    current_branch = repository.active_branch
-    repository.git.push('--set-upstream', repository.remote().name, current_branch.name)
-    logging.info(f'Pushed changes to {current_branch.name}')
-
-def get_repository(directory: str) -> Repo:
-    return Repo(directory)
 
 def main(release_name, branch, config_file, merge):
     if not config_file:
