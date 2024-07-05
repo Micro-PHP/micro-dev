@@ -3,7 +3,6 @@
 import requests
 
 def get_repository_link(package):
-    vendor, package_name = package.split('/')
-    response = requests.get(f'https://repo.packagist.org/p2/{vendor}/{package_name}.json')
-    return response.json()['packages'][f'{vendor}/{package_name}'][0]['source']['url']
+    response = requests.get(f'https://repo.packagist.org/p2/{package}.json')
+    return response.json()['packages'][package][0]['source']['url']
 
