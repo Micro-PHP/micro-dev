@@ -12,7 +12,7 @@ from git_shell import get_current_git_branch
 logging.basicConfig(level=logging.INFO)
 
 def ensure_folder_exists(func):
-    def wrapper(package_directory, *args, **kwargs):
+    def wrapper(package_directory: str, *args, **kwargs):
         if not os.path.exists(package_directory):
             logging.info(f"Creating folder {package_directory}")
             os.makedirs(package_directory)
@@ -20,7 +20,7 @@ def ensure_folder_exists(func):
     return wrapper
 
 def change_directory(func):
-    def wrapper(package_directory, *args, **kwargs):
+    def wrapper(package_directory: str, *args, **kwargs):
         original_directory = os.getcwd()
         os.chdir(package_directory)
         try:
@@ -31,7 +31,7 @@ def change_directory(func):
 
 @ensure_folder_exists
 @change_directory
-def init_repository(package_directory, package_repo) -> Repo:
+def init_repository(package_directory: str, package_repo: str) -> Repo:
     try:
         repository = Repo('.')
     except InvalidGitRepositoryError:
@@ -46,44 +46,41 @@ def init_repository(package_directory, package_repo) -> Repo:
     return repository
 
 def fetch(func):
-    def wrapper(repository, *args, **kwargs):
-        package_name = repository.remotes.origin.url.split('/')[-1].split('.')[0]
-        logging.info(f'Fetching from remote origin {repository.remotes.origin.url} to {package_name}')
+    def wrapper(repository: Repo, package: str, *args, **kwargs):
+        logging.info(f'Fetching from remote origin {repository.remotes.origin.url} to {package}')
         repository.git.fetch()
-        return func(repository, *args, **kwargs)
+        return func(repository, package, *args, **kwargs)
     return wrapper
 
 def ensure_already_branch(func):
-    def wrapper(repository, branch):
+    def wrapper(repository: Repo, package: str, branch: str, *args, **kwargs):
         if repository.active_branch.name == branch:
-            package_name = repository.remotes.origin.url.split('/')[-1].split('.')[0]
-            logging.info(f'Repository is already on {branch} branch for {package_name}')
+            logging.info(f'Repository is already on {branch} branch for {package}')
             return
-        return func(repository, branch)
+        return func(repository, branch, *args, **kwargs)
     return wrapper
 
 @fetch
 @ensure_already_branch
-def checkout(repository, branch):
-    package_name = repository.remotes.origin.url.split('/')[-1].split('.')[0]
+def checkout(repository: Repo, package: str, branch: str):
     try:
-        logging.info(f'Checking out branch {branch} in {package_name}')
+        logging.info(f'Checking out branch {branch} in {package}')
         repository.git.checkout('-f', branch)
     except InvalidGitRepositoryError:
-        logging.info(f'Branch {branch} does not exist in {package_name}')
-        raise MissingBranchError(f'Branch {branch} does not exist in {package_name}')
+        logging.info(f'Branch {branch} does not exist in {package}')
+        raise MissingBranchError(f'Branch {branch} does not exist in {package}')
 
 def main(branch, config_file):
     if not config_file:
         raise ValueError('No config file specified.')
 
-    packages_with_missing_branches = []
     packages = read_packages(config_file)
 
+    packages_with_missing_branches = []
     for package, folder in packages.items():
         repository = init_repository(folder, get_repository_link(package))
         try:
-            checkout(repository, branch)
+            checkout(repository, package, branch)
         except MissingBranchError:
             packages_with_missing_branches.append(package)
         except Exception as e:
@@ -105,4 +102,4 @@ if __name__ == '__main__':
     working_dir = os.path.dirname(config_file_path)
     os.chdir(working_dir)
 
-    main(get_current_git_branch(), os.path.basename(config_file_path))
+    main(get_current_git_branch(), config_file_path)
