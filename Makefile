@@ -18,10 +18,10 @@ init: ## Initializes the sub-repositories for build system
 	cd ./scripts; . venv/bin/activate; $(PYTHON) ./init.py --config=../repository.json
 
 release-prepare: ## Prepares releases
-	cd ./scripts; . venv/bin/activate; $(PYTHON) ./release.py --config=../repository.json "$(RELEASE_NAME)"
+	cd ./scripts; . venv/bin/activate; $(PYTHON) ./release.py --config=../repository.json --base-branch 2.x "$(RELEASE_NAME)"
 
 release-merge: ## Merges releases in GitHub
-	cd ./scripts; . venv/bin/activate; $(PYTHON) ./release.py --config=../repository.json --merge "$(RELEASE_NAME)"
+	cd ./scripts; . venv/bin/activate; $(PYTHON) ./release.py --config=../repository.json --merge --base-branch 2.x "$(RELEASE_NAME)"
 
 clean: ## Clean the build system
 	cd ./scripts; rm -rf venv __pycache__

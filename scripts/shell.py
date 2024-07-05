@@ -6,8 +6,6 @@ def execute_shell_command(cmd, cwd=None, capture_output=False):
         cwd = os.getcwd()
     logging.info(f'Running a command:"{cmd}" in a working directory {cwd}')
     try:
-        if cmd != 'git branch --show-current':
-            return
         result = subprocess.run(cmd, check=True, cwd=cwd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
         logging.info(f'STDOUT: {result.stdout}')
         if capture_output:
