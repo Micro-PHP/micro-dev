@@ -2,7 +2,7 @@
 
 import os, argparse, logging
 
-from git import Repo, InvalidGitRepositoryError
+from git import InvalidGitRepositoryError
 
 from github import create_merge_request, merge_pr, create_release, check_for_open_prs
 from git_shell import get_current_git_branch, PackageBranchExistError

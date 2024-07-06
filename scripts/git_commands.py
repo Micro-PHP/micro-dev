@@ -74,12 +74,28 @@ def init_repository(package_directory: str, package_repo: str) -> Repo:
     #     repository.remotes.origin.url = package_repo
     return repository
 
+def update_repository_remote_link(repository: Repo, remote_name: str, remote_url: str) -> None:
+    try:
+        remote = repository.remote(remote_name)
+        old_urls = remote.urls
+        if remote_url in old_urls:
+            logging.info(f'Remote URL is already {remote_url}')
+            return
+        remote.set_url(remote_url)
+        logging.info(f'Remote URL is set from {list(old_urls)} to {remote_url}')
+    except ValueError as e:
+        logging.warning(f'Remote URL cannot be changed because {e}')
+        raise e
+    except Exception as e:
+        logging.error(f'Error updating remote URL {remote_url}: {e}')
+        raise e
+
 def ensure_already_branch(func):
     def wrapper(repository: Repo, package: str, branch: str, *args, **kwargs):
         if repository.active_branch.name == branch:
             logging.info(f'Repository is already on {branch} branch for {package}')
             return
-        return func(repository, branch, *args, **kwargs)
+        return func(repository, package, branch, *args, **kwargs)
     return wrapper
 
 @fetch

@@ -18,7 +18,7 @@
         "micro/plugin-elastic":  "./src/Micro/Plugin/Elastic",
         "micro/plugin-event-emitter":  "./src/Micro/Plugin/EventEmitter",
         "micro/plugin-ffmpeg":  "./src/Micro/Plugin/Ffmpeg",
-        "micro/plugin-filesystem":  "./src/Micro/Filesystem",
+        "micro/plugin-filesystem":  "./src/Micro/Plugin/Filesystem",
         "micro/plugin-http-boot":  "./src/Micro/Plugin/HttpBoot",
         "micro/plugin-http-core":  "./src/Micro/Plugin/HttpCore",
         "micro/plugin-http-exceptions":  "./src/Micro/Plugin/HttpExceptions",
