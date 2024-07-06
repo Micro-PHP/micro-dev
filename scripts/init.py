@@ -2,11 +2,10 @@
 
 import os, logging, argparse
 
-from exceptions import MissingBranchError
 from packages import read_packages
 from packagist import get_repository_link
 from git_shell import get_current_git_branch
-from git_commands import checkout, init_repository
+from git_commands import checkout, init_repository, MissingBranchError
 
 logging.basicConfig(level=logging.INFO)
 

@@ -2,7 +2,15 @@
 import os, logging
 
 from git import Repo, InvalidGitRepositoryError
-from exceptions import MissingBranchError
+
+class NothingToCommitException(Exception):
+    pass
+
+class MissingBranchError(Exception):
+    pass
+
+class BranchNotActiveError(Exception):
+    pass
 
 def fetch(func):
     def wrapper(repository: Repo, package: str, *args, **kwargs):
@@ -16,10 +24,11 @@ def create_or_update_branch(repository: Repo, package: str, branch_name: str):
     if branch_name in repository.heads:
         logging.info(f'Branch {branch_name} exists.')
         if repository.active_branch.name != branch_name:
-            raise NameError(f'Branch {branch_name} already exists but is not active.')
+            raise BranchNotActiveError(f'Branch {branch_name} already exists but is not active.')
         logging.info(f"Repository is already on branch '{branch_name}'")
     else:
         repository.create_head(branch_name)
+        logging.info(f'Branch {branch_name} created.')
 
 def commit_changes(repository: Repo, release_name: str, package: str):
     untracked_files = repository.untracked_files
@@ -28,7 +37,7 @@ def commit_changes(repository: Repo, release_name: str, package: str):
     all_files_to_add = untracked_files + unstaged_files + staged_files
     if not all_files_to_add:
         logging.info('No changes to commit.')
-        return
+        raise NothingToCommitException('No changes to commit.')
     repository.index.add(all_files_to_add)
     repository.index.commit(f'Update {release_name} for {package}')
 
