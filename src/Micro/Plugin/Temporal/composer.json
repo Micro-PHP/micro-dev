@@ -1,0 +1,23 @@
+{
+    "name": "micro/plugin-temporal",
+    "description": "Micro Framework: TemporalIO plugin",
+    "type": "micro-library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Micro\\Plugin\\Temporal\\": "/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Stanislau Komar",
+            "email": "stanislau_komar@epam.com"
+        }
+    ],
+    "require": {
+        "micro/kernel": "^2.0",
+        "temporal/sdk": ">=2.0",
+        "spiral/tokenizer": ">=2.7"
+    },
+    "minimum-stability": "dev"
+}
