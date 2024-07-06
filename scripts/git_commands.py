@@ -27,19 +27,34 @@ def create_or_update_branch(repository: Repo, package: str, branch_name: str):
             raise BranchNotActiveError(f'Branch {branch_name} already exists but is not active.')
         logging.info(f"Repository is already on branch '{branch_name}'")
     else:
-        repository.create_head(branch_name)
-        logging.info(f'Branch {branch_name} created.')
+        new_branch = repository.create_head(branch_name)
+        new_branch.checkout()
+        logging.info(f'Branch {new_branch.name} created and switched to.')
+
+def get_changes_to_commit(repository: Repo):
+    untracked_files = repository.untracked_files
+    unstaged_files = [item.a_path for item in repository.index.diff(None) if item.change_type != 'D']
+    staged_files = [item.a_path for item in repository.index.diff('HEAD') if item.change_type != 'D']
+    deleted_files = [item.a_path for item in repository.index.diff(None) if item.change_type == 'D']
+    return untracked_files + unstaged_files + staged_files, deleted_files
 
 def commit_changes(repository: Repo, release_name: str, package: str):
-    untracked_files = repository.untracked_files
-    unstaged_files = [item.a_path for item in repository.index.diff(None)]
-    staged_files = [item.a_path for item in repository.index.diff('HEAD')]
-    all_files_to_add = untracked_files + unstaged_files + staged_files
-    if not all_files_to_add:
+    files_to_commit, files_to_remove = get_changes_to_commit(repository)
+    logging.debug(f'Files to commit: {files_to_commit}')
+    logging.debug(f'Files to remove: {files_to_remove}')
+
+    if not files_to_commit and not files_to_remove:
         logging.info('No changes to commit.')
         raise NothingToCommitException('No changes to commit.')
-    repository.index.add(all_files_to_add)
-    repository.index.commit(f'Update {release_name} for {package}')
+
+    if files_to_commit:
+        repository.index.add(files_to_commit)
+    if files_to_remove:
+        repository.index.remove(files_to_remove)
+
+    commit_message = f'Update {release_name} for {package}'
+    logging.info(f'Committing changes with message: {commit_message}')
+    repository.index.commit(commit_message)
 
 def push_changes(repository: Repo):
     current_branch = repository.active_branch
