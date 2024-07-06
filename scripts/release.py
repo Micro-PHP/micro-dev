@@ -5,9 +5,11 @@ import os, argparse, logging
 from git import InvalidGitRepositoryError
 
 from github import create_merge_request, merge_pr, create_release, check_for_open_prs
-from git_shell import get_current_git_branch, PackageBranchExistError
+from git_shell import get_current_git_branch
 from packages import read_packages
-from git_commands import create_or_update_branch, get_repository, commit_changes, push_changes
+from git_commands import create_or_update_branch, get_repository, commit_changes, NothingToCommitException, push_changes, \
+    BranchNotActiveError, get_changes_to_commit
+from shell import ShellError
 
 logging.basicConfig(level=logging.INFO)
 
@@ -32,6 +34,10 @@ def main(release_name: str, branch: str, base_branch: str, config_file: str, mer
                     create_release('.', base_branch, release_name)
             else:
                 repo = get_repository('.')
+                files_to_add, files_to_remove = get_changes_to_commit(repo)
+                if not bool(files_to_add) and not bool(files_to_remove):
+                    logging.info('No changes to commit, skipping')
+                    continue
                 create_or_update_branch(repo, package, branch)
                 commit_changes(repo, release_name, package)
                 push_changes(repo)
@@ -39,9 +45,17 @@ def main(release_name: str, branch: str, base_branch: str, config_file: str, mer
                     create_merge_request('.', base_branch, branch, release_name)
                 else:
                     logging.info('MR is already opened')
+        except ShellError as e:
+            logging.error(f'Shell error: {e}')
+            failed_packages.append(package)
+        except BranchNotActiveError:
+            logging.warning(f'Branch does exist but is not active. Please manually switch to branch `{branch}`')
+            failed_packages.append(package)
         except InvalidGitRepositoryError:
             logging.error(f"Invalid git repository {folder}")
             failed_packages.append(package)
+        except NothingToCommitException:
+            logging.info('Nothing to commit, skipping pushing and PR creation')
         finally:
             os.chdir(original_directory)
 

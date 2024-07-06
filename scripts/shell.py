@@ -1,5 +1,7 @@
 import os, logging, subprocess
 
+class ShellError(Exception):
+    pass
 
 def execute_shell_command(cmd, cwd=None, capture_output=False):
     if cwd is None:
@@ -13,4 +15,4 @@ def execute_shell_command(cmd, cwd=None, capture_output=False):
     except subprocess.CalledProcessError as e:
         logging.error(f'Command "{cmd}" failed with error: {e}')
         logging.error(f'STDERR: {e.stderr}')
-        exit(1)
+        raise ShellError(f'Command "{cmd}" failed with error: {e}')
