@@ -9,4 +9,5 @@ yarn-error.log*
 /public/build/
 *.lock
 venv
+__pycache__
 

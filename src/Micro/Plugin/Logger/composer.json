@@ -15,6 +15,7 @@
         "micro/kernel-boot-dependency": "^2.0",
         "psr/log": "^1 || ^2 || ^3"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Plugin\\Logger\\": "/"

@@ -16,6 +16,7 @@
         "psr/simple-cache": "^3.0",
         "symfony/cache": "^6"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Plugin\\Cache\\": ""

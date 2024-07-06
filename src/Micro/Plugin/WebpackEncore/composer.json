@@ -17,6 +17,7 @@
         "micro/plugin-twig": "^2.0",
         "symfony/serializer": "^6.2 || ^6.3"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Plugin\\WebpackEncore\\": "/"

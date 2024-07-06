@@ -16,6 +16,7 @@
     "suggest": {
         "micro/autowire": "Autowire helper for dependency injection"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Framework\\DependencyInjection\\": "/"

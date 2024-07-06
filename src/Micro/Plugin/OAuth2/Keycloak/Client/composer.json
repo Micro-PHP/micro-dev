@@ -16,6 +16,7 @@
         "micro/kernel-boot-configuration": "^2.0",
         "micro/plugin-security": "^2.0"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Plugin\\OAuth2\\Keycloak\\Client\\": "/"

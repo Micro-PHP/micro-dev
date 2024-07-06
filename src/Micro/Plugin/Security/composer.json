@@ -17,6 +17,7 @@
     "require": {
         "firebase/php-jwt": "^6"
     },
+    "minimum-stability": "dev",
     "config": {
         "sort-packages": true
     }

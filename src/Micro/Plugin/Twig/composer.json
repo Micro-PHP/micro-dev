@@ -16,6 +16,7 @@
         "micro/kernel-boot-plugin-depended": "^2.0",
         "twig/twig": "^3"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Plugin\\Twig\\": "/"

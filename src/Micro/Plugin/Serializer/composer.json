@@ -16,6 +16,7 @@
     "require": {
         "micro/kernel": "^2.0"
     },
+    "minimum-stability": "dev",
     "suggest": {
         "micro/plugin-serializer-symfony": "Symfony serializer provider for Micro PHP Framework"
     },

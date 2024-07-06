@@ -15,6 +15,7 @@
         "micro/plugin-event-emitter": "^2.0",
         "micro/plugin-http-core": "^2.0"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Plugin\\HttpBoot\\": "/"
