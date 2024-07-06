@@ -13,6 +13,7 @@
         "micro/kernel": "^2.0",
         "symfony/finder": "^6.2 || ^6.3"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Plugin\\Locator\\": "/"

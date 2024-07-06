@@ -1,8 +1,8 @@
 {
     "name": "micro/kernel-boot-configuration",
     "description": "Micro Framework: Kernel Boot loader - component to provide plugin configuration",
-    "type": "library",
     "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "Stanislau Komar",
@@ -13,6 +13,7 @@
         "php": "^8.2",
         "micro/kernel": "^2.0"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Framework\\BootConfiguration\\": "/"

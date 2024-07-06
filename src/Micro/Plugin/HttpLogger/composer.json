@@ -13,6 +13,7 @@
         "micro/plugin-http-core": "^2.0",
         "micro/plugin-logger-core": "^2.0"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Plugin\\HttpLogger\\": "/"

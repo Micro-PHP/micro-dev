@@ -15,6 +15,7 @@
         "micro/kernel-boot-configuration": "^2.0",
         "micro/kernel-boot-dependency": "^2.0"
     },
+    "minimum-stability": "dev",
     "suggest": {
         "micro/plugin-filesystem-local": "^2.0",
         "micro/plugin-filesystem-s3": "^2.0"

@@ -17,5 +17,6 @@
     "require": {
         "micro/kernel": "^2.0",
         "php-ffmpeg/php-ffmpeg": "^1.0"
-    }
+    },
+    "minimum-stability": "dev"
 }

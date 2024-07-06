@@ -14,6 +14,7 @@
         "micro/autowire": "^2.0",
         "micro/kernel": "^2.0"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Framework\\BootDependency\\": "/"

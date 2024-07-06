@@ -13,6 +13,7 @@
         "micro/kernel": "^2.0",
         "ramsey/uuid": "^4.2"
     },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Plugin\\Uuid\\": "/"
