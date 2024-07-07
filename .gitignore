@@ -3,6 +3,7 @@
 /var/
 .env.local
 .phpunit.result.cache
+.phpunit.cache
 /node_modules/
 yarn-debug.log*
 yarn-error.log*
