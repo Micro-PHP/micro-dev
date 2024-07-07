@@ -45,15 +45,15 @@ readonly class ConfigurationProviderBootLoader implements PluginBootLoaderInterf
     /**
      * {@inheritDoc}
      */
-    public function boot(object $applicationPlugin): void
+    public function boot(object $plugin): void
     {
-        if (!($applicationPlugin instanceof ConfigurableInterface)) {
+        if (!($plugin instanceof ConfigurableInterface)) {
             return;
         }
 
-        $applicationPlugin->setConfiguration(
+        $plugin->setConfiguration(
             $this->createPluginConfigurationClassResolver()
-                 ->resolve(\get_class($applicationPlugin))
+                 ->resolve(\get_class($plugin))
         );
     }
 

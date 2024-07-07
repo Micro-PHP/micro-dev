@@ -13,7 +13,15 @@ from shell import ShellError
 
 logging.basicConfig(level=logging.INFO)
 
-def main(release_name: str, branch: str, base_branch: str, config_file: str, merge: bool, do_not_release: bool):
+def main(
+    release_name: str,
+    branch: str,
+    base_branch: str,
+    config_file: str,
+    merge: bool,
+    do_not_release: bool,
+    skip_release: bool
+):
     if not config_file:
         raise ValueError('No config file specified.')
 
@@ -27,9 +35,10 @@ def main(release_name: str, branch: str, base_branch: str, config_file: str, mer
         os.chdir(folder)
         try:
             if merge:
-                if not check_for_open_prs('.', branch):
-                    raise Exception('No open PRs exist. Please open one first')
-                merge_pr('.', branch, release_name)
+                if check_for_open_prs('.', branch):
+                    merge_pr('.', branch, release_name)
+                elif skip_release:
+                    continue
                 if not do_not_release:
                     create_release('.', base_branch, release_name)
             else:
@@ -37,6 +46,8 @@ def main(release_name: str, branch: str, base_branch: str, config_file: str, mer
                 files_to_add, files_to_remove = get_changes_to_commit(repo)
                 if not bool(files_to_add) and not bool(files_to_remove):
                     logging.info('No changes to commit, skipping')
+                    if check_for_open_prs('.', branch):
+                        logging.info('btw, PR is already created')
                     continue
                 create_or_update_branch(repo, package, branch)
                 commit_changes(repo, release_name, package)
@@ -44,7 +55,7 @@ def main(release_name: str, branch: str, base_branch: str, config_file: str, mer
                 if not check_for_open_prs('.', branch):
                     create_merge_request('.', base_branch, branch, release_name)
                 else:
-                    logging.info('MR is already opened')
+                    logging.info('PR is already opened')
         except ShellError as e:
             logging.error(f'Shell error: {e}')
             failed_packages.append(package)
@@ -67,7 +78,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Release script to handle package versions.')
     parser.add_argument('--config', '-c', required=True, help='Path to the config json file')
     parser.add_argument('--merge', action='store_true', help='Merge all open merge requests and create releases')
-    parser.add_argument('--no-release', action='store_true', help='Don\'t create releases')
+    parser.add_argument('--no-release', action='store_true', help='Don\'t create any release')
+    parser.add_argument('--skip-release', '-s', action='store_true', help='Skip creating a release if no PR opened')
     parser.add_argument('--base-branch', '-b', type=str, help='Base branch')
     parser.add_argument('release_name', type=str, help='Name of the release')
     app_args = parser.parse_args()
@@ -82,5 +94,6 @@ if __name__ == '__main__':
         app_args.base_branch,
         config_file_path,
         app_args.merge,
-        app_args.no_release
+        app_args.no_release,
+        app_args.skip_release
     )
