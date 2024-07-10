@@ -1,0 +1,28 @@
+{
+    "name": "micro/kernel",
+    "description": "",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Stanislau.Komar",
+            "email": "stanislau_komar@epam.com"
+        }
+    ],
+    "require": {
+        "php": "^8.2",
+        "micro/dependency-injection": "^2.0"
+    },
+    "minimum-stability": "dev",
+    "autoload": {
+        "psr-4": {
+            "Micro\\Framework\\Kernel\\": "/"
+        },
+        "exclude-from-classmap": [
+            "/Tests/"
+        ]
+    },
+    "config": {
+        "sort-packages": true
+    }
+}
