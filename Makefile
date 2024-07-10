@@ -15,6 +15,7 @@ venv/touchfile: scripts/requirements.txt
 	cd ./scripts; touch venv/touchfile
 
 init: ## Initializes the sub-repositories for build system
+init: venv
 	cd ./scripts; . venv/bin/activate; $(PYTHON) ./init.py --config=../repository.json
 
 release-prepare: ## Prepares releases
