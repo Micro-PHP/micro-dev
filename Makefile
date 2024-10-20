@@ -9,21 +9,21 @@ help: ## Outputs this help screen
 
 venv: venv/touchfile
 
-venv/touchfile: scripts/requirements.txt
-	cd ./scripts; test -d venv || virtualenv venv
-	cd ./scripts; . venv/bin/activate; $(PIP) install -Ur requirements.txt
-	cd ./scripts; touch venv/touchfile
+venv/touchfile: ./requirements.txt
+	test -d venv || virtualenv venv
+	. venv/bin/activate; $(PIP) install -Ur requirements.txt
+	touch venv/touchfile
 
 init: ## Initializes the sub-repositories for build system
 init: venv
-	cd ./scripts; . venv/bin/activate; $(PYTHON) ./init.py --config=../repository.json
+	. venv/bin/activate; $(PYTHON) ./scripts/init.py --config=./repository.json
 
 release-prepare: ## Prepares releases
-	cd ./scripts; . venv/bin/activate; $(PYTHON) ./release.py --config=../repository.json --base-branch 2.x "$(RELEASE_NAME)"
+	. venv/bin/activate; $(PYTHON) ./scripts/release.py --config=./repository.json --base-branch 2.x "$(RELEASE_NAME)"
 
 release-merge: ## Merges releases in GitHub
-	cd ./scripts; . venv/bin/activate; $(PYTHON) ./release.py --config=../repository.json --merge --base-branch 2.x "$(RELEASE_NAME)"
+	. venv/bin/activate; $(PYTHON) ./scripts/release.py --config=./repository.json --merge --base-branch 2.x "$(RELEASE_NAME)"
 
 clean: ## Clean the build system
-	cd ./scripts; rm -rf venv __pycache__
-	cd ./scripts; find -iname "*.pyc" -delete
+	rm -rf venv __pycache__
+	find -iname "*.pyc" -delete
