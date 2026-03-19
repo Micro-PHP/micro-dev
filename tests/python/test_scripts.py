@@ -180,8 +180,8 @@ def test_all_scripts_support_help():
 def test_release_main_merge(monkeypatch, tmp_path):
     paths = {'pkg': str(tmp_path)}
     monkeypatch.setattr(release, 'read_packages', lambda f: paths)
-    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge: [])
-    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge: [])
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge, release_current: [])
     monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda packages: [])
     monkeypatch.setattr(release, 'check_for_open_prs', lambda cwd, b: True)
     monkeypatch.setattr(release, 'check_for_merged_prs', lambda cwd, b: False)
@@ -198,7 +198,7 @@ def test_release_main_merge(monkeypatch, tmp_path):
         called['release'] = (r, notes)
     monkeypatch.setattr(release, 'merge_pr', fake_merge)
     monkeypatch.setattr(release, 'create_release', fake_release)
-    failed = release.main('v1', 'br', 'base', 'cfg', True, False, False)
+    failed = release.main('v1', 'br', 'base', 'cfg', True, False, False, False, False)
     assert failed == []
     assert called == {'fetch_tags': True, 'merge': 'v2.0.1', 'release': ('v2.0.1', 'notes')}
 
@@ -206,8 +206,8 @@ def test_release_main_merge(monkeypatch, tmp_path):
 def test_release_main_merge_skips_release_without_open_pr(monkeypatch, tmp_path):
     paths = {'pkg': str(tmp_path)}
     monkeypatch.setattr(release, 'read_packages', lambda f: paths)
-    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge: [])
-    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge: [])
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge, release_current: [])
     monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda packages: [])
     monkeypatch.setattr(release, 'check_for_open_prs', lambda cwd, b: False)
     monkeypatch.setattr(release, 'check_for_merged_prs', lambda cwd, b: False)
@@ -219,7 +219,7 @@ def test_release_main_merge_skips_release_without_open_pr(monkeypatch, tmp_path)
     monkeypatch.setattr(release, 'merge_pr', lambda *args: actions.append('merge'))
     monkeypatch.setattr(release, 'create_release', lambda *args: actions.append('release'))
 
-    failed = release.main('v1', 'br', 'base', 'cfg', True, False, False)
+    failed = release.main('v1', 'br', 'base', 'cfg', True, False, False, False, False)
 
     assert failed == []
     assert actions == []
@@ -229,8 +229,8 @@ def test_release_main_commit_flow(monkeypatch, tmp_path):
     paths = {'pkg': str(tmp_path)}
     repo = object()
     monkeypatch.setattr(release, 'read_packages', lambda f: paths)
-    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge: [])
-    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge: [])
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge, release_current: [])
     monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda packages: [])
     monkeypatch.setattr(release, 'get_repository', lambda p: repo)
     monkeypatch.setattr(release, 'get_changes_to_commit', lambda r: (['a'], []))
@@ -242,7 +242,7 @@ def test_release_main_commit_flow(monkeypatch, tmp_path):
     monkeypatch.setattr(release, 'push_changes', lambda r: actions.append('push'))
     monkeypatch.setattr(release, 'check_for_open_prs', lambda c, b: False)
     monkeypatch.setattr(release, 'create_merge_request', lambda c, base, br, rn: actions.append('pr'))
-    failed = release.main('v1', 'br', 'base', 'cfg', False, False, False)
+    failed = release.main('v1', 'br', 'base', 'cfg', False, False, False, False, False)
     assert failed == []
     assert actions == ['branch', 'commit', 'push', 'pr']
 
@@ -250,8 +250,8 @@ def test_release_main_commit_flow(monkeypatch, tmp_path):
 def test_release_main_creates_missing_release_for_already_merged_pr(monkeypatch, tmp_path):
     paths = {'pkg': str(tmp_path)}
     monkeypatch.setattr(release, 'read_packages', lambda f: paths)
-    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge: [])
-    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge: [])
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge, release_current: [])
     monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda packages: [])
     monkeypatch.setattr(release, 'check_for_open_prs', lambda cwd, b: False)
     monkeypatch.setattr(release, 'check_for_merged_prs', lambda cwd, b: True)
@@ -266,7 +266,7 @@ def test_release_main_creates_missing_release_for_already_merged_pr(monkeypatch,
     monkeypatch.setattr(release, 'merge_pr', lambda *args: actions.append('merge'))
     monkeypatch.setattr(release, 'create_release', lambda cwd, base, rel, notes: actions.append((base, rel, notes)))
 
-    failed = release.main('v1', 'br', 'base', 'cfg', True, False, False)
+    failed = release.main('v1', 'br', 'base', 'cfg', True, False, False, False, False)
 
     assert failed == []
     assert actions == [('base', 'v2.0.1', 'notes')]
@@ -275,8 +275,8 @@ def test_release_main_creates_missing_release_for_already_merged_pr(monkeypatch,
 def test_release_main_skips_missing_release_recovery_when_nothing_unreleased(monkeypatch, tmp_path):
     paths = {'pkg': str(tmp_path)}
     monkeypatch.setattr(release, 'read_packages', lambda f: paths)
-    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge: [])
-    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge: [])
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge, release_current: [])
     monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda packages: [])
     monkeypatch.setattr(release, 'check_for_open_prs', lambda cwd, b: False)
     monkeypatch.setattr(release, 'check_for_merged_prs', lambda cwd, b: True)
@@ -289,7 +289,49 @@ def test_release_main_skips_missing_release_recovery_when_nothing_unreleased(mon
     monkeypatch.setattr(release, 'merge_pr', lambda *args: actions.append('merge'))
     monkeypatch.setattr(release, 'create_release', lambda *args: actions.append('release'))
 
-    failed = release.main('v1', 'br', 'base', 'cfg', True, False, False)
+    failed = release.main('v1', 'br', 'base', 'cfg', True, False, False, False, False)
+
+    assert failed == []
+    assert actions == []
+
+
+def test_release_main_release_current_creates_release_from_base_branch(monkeypatch, tmp_path):
+    paths = {'pkg': str(tmp_path)}
+    monkeypatch.setattr(release, 'read_packages', lambda f: paths)
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda packages: [])
+    monkeypatch.setattr(release, 'check_gh_installed', lambda: True)
+    monkeypatch.setattr(release, 'validate_gh_access', lambda: True)
+    monkeypatch.setattr(release, 'get_repository', lambda p: object())
+    monkeypatch.setattr(release, 'fetch_tags', lambda repo: None)
+    monkeypatch.setattr(release, 'has_unreleased_commits', lambda repo, branch: True)
+    monkeypatch.setattr(release, 'checkout', lambda repo, package, branch: None)
+    monkeypatch.setattr(release, 'collect_release_notes', lambda r, b: 'notes')
+    actions = []
+    monkeypatch.setattr(release, 'create_release', lambda cwd, base, rel, notes: actions.append((base, rel, notes)))
+
+    failed = release.main('v2.0.0-alpha1', None, '2.x', 'cfg', False, True, False, False, False)
+
+    assert failed == []
+    assert actions == [('2.x', 'v2.0.0-alpha1', 'notes')]
+
+
+def test_release_main_release_current_skips_when_nothing_unreleased(monkeypatch, tmp_path):
+    paths = {'pkg': str(tmp_path)}
+    monkeypatch.setattr(release, 'read_packages', lambda f: paths)
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda packages: [])
+    monkeypatch.setattr(release, 'check_gh_installed', lambda: True)
+    monkeypatch.setattr(release, 'validate_gh_access', lambda: True)
+    monkeypatch.setattr(release, 'get_repository', lambda p: object())
+    monkeypatch.setattr(release, 'fetch_tags', lambda repo: None)
+    monkeypatch.setattr(release, 'has_unreleased_commits', lambda repo, branch: False)
+    actions = []
+    monkeypatch.setattr(release, 'create_release', lambda *args: actions.append('release'))
+
+    failed = release.main('v2.0.0-alpha1', None, '2.x', 'cfg', False, True, False, False, False)
 
     assert failed == []
     assert actions == []
@@ -323,6 +365,48 @@ def test_release_cli_requires_release_branch(monkeypatch):
     assert 'release-branch' in captured['msg']
 
 
+def test_release_cli_rejects_release_branch_with_release_current(monkeypatch):
+    monkeypatch.setattr(release, 'check_gh_installed', lambda: True)
+    captured = {}
+
+    def fake_error(self, message):
+        captured['msg'] = message
+        raise SystemExit(2)
+
+    monkeypatch.setattr(argparse.ArgumentParser, 'error', fake_error, raising=False)
+    with pytest.raises(SystemExit):
+        release.run_cli(['--release-current', '--base-branch', '2.x', '--release-branch', 'release/1', '--config', 'cfg', 'rel'])
+    assert 'cannot be used with --release-current' in captured['msg']
+
+
+def test_release_cli_rejects_merge_with_release_current(monkeypatch):
+    monkeypatch.setattr(release, 'check_gh_installed', lambda: True)
+    captured = {}
+
+    def fake_error(self, message):
+        captured['msg'] = message
+        raise SystemExit(2)
+
+    monkeypatch.setattr(argparse.ArgumentParser, 'error', fake_error, raising=False)
+    with pytest.raises(SystemExit):
+        release.run_cli(['--release-current', '--merge', '--base-branch', '2.x', '--config', 'cfg', 'rel'])
+    assert '--merge cannot be used with --release-current' in captured['msg']
+
+
+def test_release_cli_rejects_force_release_without_release_current(monkeypatch):
+    monkeypatch.setattr(release, 'check_gh_installed', lambda: True)
+    captured = {}
+
+    def fake_error(self, message):
+        captured['msg'] = message
+        raise SystemExit(2)
+
+    monkeypatch.setattr(argparse.ArgumentParser, 'error', fake_error, raising=False)
+    with pytest.raises(SystemExit):
+        release.run_cli(['--force-release', '--base-branch', '2.x', '--release-branch', 'release/1', '--config', 'cfg', 'rel'])
+    assert '--force-release can only be used with --release-current' in captured['msg']
+
+
 def test_release_cli_exits_non_zero_on_failed_packages(monkeypatch):
     monkeypatch.setattr(release, 'main', lambda *args: ['pkg'])
     monkeypatch.setattr(release, 'os', os)
@@ -349,7 +433,7 @@ def test_preflight_branches_fails_for_missing_base_branch(monkeypatch, tmp_path)
     monkeypatch.setattr(release, 'has_remote_branch', lambda repo, branch: branch == 'release/1')
     monkeypatch.setattr(release, 'check_for_merged_prs', lambda cwd, branch: False)
 
-    failed = release.preflight_branches(paths, 'release/1', '2.x', False)
+    failed = release.preflight_branches(paths, 'release/1', '2.x', False, False)
 
     assert failed == ['pkg']
 
@@ -362,7 +446,7 @@ def test_preflight_branches_fails_for_missing_release_branch_in_prepare(monkeypa
     monkeypatch.setattr(release, 'has_remote_branch', lambda repo, branch: branch == '2.x')
     monkeypatch.setattr(release, 'check_for_merged_prs', lambda cwd, branch: False)
 
-    failed = release.preflight_branches(paths, 'release/1', '2.x', False)
+    failed = release.preflight_branches(paths, 'release/1', '2.x', False, False)
 
     assert failed == ['pkg']
 
@@ -375,7 +459,7 @@ def test_preflight_branches_allows_missing_release_branch_for_merged_pr_recovery
     monkeypatch.setattr(release, 'has_remote_branch', lambda repo, branch: branch == '2.x')
     monkeypatch.setattr(release, 'check_for_merged_prs', lambda cwd, branch: True)
 
-    failed = release.preflight_branches(paths, 'release/1', '2.x', True)
+    failed = release.preflight_branches(paths, 'release/1', '2.x', True, False)
 
     assert failed == []
 
@@ -385,11 +469,11 @@ def test_release_main_returns_preflight_failures_without_processing(monkeypatch,
     monkeypatch.setattr(release, 'read_packages', lambda f: paths)
     monkeypatch.setattr(release, 'check_gh_installed', lambda: True)
     monkeypatch.setattr(release, 'validate_gh_access', lambda: True)
-    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge: ['pkg'])
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: ['pkg'])
     called = []
     monkeypatch.setattr(release, 'get_repository', lambda p: called.append('repo'))
 
-    failed = release.main('v1', 'release/1', '2.x', 'cfg', False, False, False)
+    failed = release.main('v1', 'release/1', '2.x', 'cfg', False, False, False, False, False)
 
     assert failed == ['pkg']
     assert called == []
@@ -402,7 +486,7 @@ def test_preflight_release_tags_fails_for_existing_tag(monkeypatch, tmp_path):
     monkeypatch.setattr(release, 'fetch_tags', lambda repo: None)
     monkeypatch.setattr(release, 'has_tag', lambda repo, tag_name: tag_name == 'v2.0.0-alpha1')
 
-    failed = release.preflight_release_tags(paths, 'v2.0.0-alpha1', True)
+    failed = release.preflight_release_tags(paths, 'v2.0.0-alpha1', True, False)
 
     assert failed == ['pkg']
 
@@ -412,7 +496,7 @@ def test_preflight_release_tags_skips_non_merge_mode(monkeypatch, tmp_path):
     called = []
     monkeypatch.setattr(release, 'get_repository', lambda p: called.append('repo'))
 
-    failed = release.preflight_release_tags(paths, 'v2.0.0-alpha1', False)
+    failed = release.preflight_release_tags(paths, 'v2.0.0-alpha1', False, False)
 
     assert failed == []
     assert called == []
@@ -423,12 +507,12 @@ def test_release_main_returns_tag_preflight_failures_without_processing(monkeypa
     monkeypatch.setattr(release, 'read_packages', lambda f: paths)
     monkeypatch.setattr(release, 'check_gh_installed', lambda: True)
     monkeypatch.setattr(release, 'validate_gh_access', lambda: True)
-    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge: [])
-    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge: ['pkg'])
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge, release_current: ['pkg'])
     called = []
     monkeypatch.setattr(release, 'get_repository', lambda p: called.append('repo'))
 
-    failed = release.main('v2.0.0-alpha1', 'release/1', '2.x', 'cfg', True, False, False)
+    failed = release.main('v2.0.0-alpha1', 'release/1', '2.x', 'cfg', True, False, False, False, False)
 
     assert failed == ['pkg']
     assert called == []
@@ -477,12 +561,12 @@ def test_release_main_returns_worktree_preflight_failures_without_processing(mon
     monkeypatch.setattr(release, 'read_packages', lambda f: paths)
     monkeypatch.setattr(release, 'check_gh_installed', lambda: True)
     monkeypatch.setattr(release, 'validate_gh_access', lambda: True)
-    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge: [])
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
     monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda packages: ['pkg'])
     called = []
     monkeypatch.setattr(release, 'get_repository', lambda p: called.append('repo'))
 
-    failed = release.main('v1', 'release/1', '2.x', 'cfg', False, False, False)
+    failed = release.main('v1', 'release/1', '2.x', 'cfg', False, False, False, False, False)
 
     assert failed == ['pkg']
     assert called == []
@@ -491,8 +575,8 @@ def test_release_main_returns_worktree_preflight_failures_without_processing(mon
 def test_release_main_skips_worktree_preflight_in_merge_mode(monkeypatch, tmp_path):
     paths = {'pkg': str(tmp_path)}
     monkeypatch.setattr(release, 'read_packages', lambda f: paths)
-    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge: [])
-    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge: [])
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge, release_current: [])
     called = []
     monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda packages: called.append('worktree') or ['pkg'])
     monkeypatch.setattr(release, 'check_gh_installed', lambda: True)
@@ -502,7 +586,7 @@ def test_release_main_skips_worktree_preflight_in_merge_mode(monkeypatch, tmp_pa
     monkeypatch.setattr(release, 'check_for_open_prs', lambda cwd, b: False)
     monkeypatch.setattr(release, 'check_for_merged_prs', lambda cwd, b: False)
 
-    failed = release.main('v1', 'release/1', '2.x', 'cfg', True, False, False)
+    failed = release.main('v1', 'release/1', '2.x', 'cfg', True, False, False, False, False)
 
     assert failed == []
     assert called == []
@@ -525,6 +609,8 @@ def test_plan_package_action_reports_blocked_dirty_prepare_repo(monkeypatch, tmp
         'v2.0.0-alpha1',
         'release/1',
         '2.x',
+        False,
+        False,
         False,
         False,
         False
@@ -550,6 +636,8 @@ def test_plan_package_action_reports_existing_release_tag(monkeypatch, tmp_path)
         '2.x',
         True,
         False,
+        False,
+        False,
         False
     )
 
@@ -567,7 +655,7 @@ def test_release_main_dry_run_uses_preview_without_running_preflight(monkeypatch
     monkeypatch.setattr(release, 'preflight_branches', lambda *args: called.append('branches') or [])
     monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda *args: called.append('worktrees') or [])
 
-    failed = release.main('v1', 'release/1', '2.x', 'cfg', False, False, False, dry_run=True)
+    failed = release.main('v1', 'release/1', '2.x', 'cfg', False, False, False, False, False, dry_run=True)
 
     assert failed == []
     assert called == []
@@ -580,9 +668,56 @@ def test_release_main_status_returns_blocked_preview_packages(monkeypatch, tmp_p
     monkeypatch.setattr(release, 'validate_gh_access', lambda: True)
     monkeypatch.setattr(release, 'preview_actions', lambda *args: ['pkg'])
 
-    failed = release.main('v1', 'release/1', '2.x', 'cfg', False, False, False, status=True)
+    failed = release.main('v1', 'release/1', '2.x', 'cfg', False, False, False, False, False, status=True)
 
     assert failed == ['pkg']
+
+
+def test_release_main_release_current_force_release_ignores_unreleased_commit_check(monkeypatch, tmp_path):
+    paths = {'pkg': str(tmp_path)}
+    monkeypatch.setattr(release, 'read_packages', lambda f: paths)
+    monkeypatch.setattr(release, 'preflight_branches', lambda packages, rel, base, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_release_tags', lambda packages, release_name, merge, release_current: [])
+    monkeypatch.setattr(release, 'preflight_clean_worktrees', lambda packages: [])
+    monkeypatch.setattr(release, 'check_gh_installed', lambda: True)
+    monkeypatch.setattr(release, 'validate_gh_access', lambda: True)
+    monkeypatch.setattr(release, 'get_repository', lambda p: object())
+    monkeypatch.setattr(release, 'fetch_tags', lambda repo: None)
+    monkeypatch.setattr(release, 'has_unreleased_commits', lambda repo, branch: False)
+    monkeypatch.setattr(release, 'checkout', lambda repo, package, branch: None)
+    monkeypatch.setattr(release, 'collect_release_notes', lambda r, b: 'notes')
+    actions = []
+    monkeypatch.setattr(release, 'create_release', lambda cwd, base, rel, notes: actions.append((base, rel, notes)))
+
+    failed = release.main('v2.0.0-alpha1', None, '2.x', 'cfg', False, True, True, False, False)
+
+    assert failed == []
+    assert actions == [('2.x', 'v2.0.0-alpha1', 'notes')]
+
+
+def test_plan_package_action_reports_force_release_from_current_branch(monkeypatch, tmp_path):
+    repo = SimpleNamespace(is_dirty=lambda untracked_files=True: False)
+    monkeypatch.setattr(release, 'get_repository', lambda p: repo)
+    monkeypatch.setattr(release, 'fetch_remote', lambda repo: None)
+    monkeypatch.setattr(release, 'fetch_tags', lambda repo: None)
+    monkeypatch.setattr(release, 'has_remote_branch', lambda repo, branch: True)
+    monkeypatch.setattr(release, 'has_tag', lambda repo, tag_name: False)
+
+    action, blocked = release.plan_package_action(
+        'pkg',
+        str(tmp_path),
+        'v2.0.0-alpha1',
+        None,
+        '2.x',
+        False,
+        True,
+        True,
+        False,
+        False
+    )
+
+    assert blocked is False
+    assert action == 'would force-create release `v2.0.0-alpha1` from `2.x`'
 
 
 def test_collect_release_notes_uses_commit_subjects_for_squash_flow(tmp_path):

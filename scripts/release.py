@@ -7,7 +7,7 @@ from git import InvalidGitRepositoryError
 from github import create_merge_request, merge_pr, create_release, check_for_open_prs, check_for_merged_prs, check_auth
 from packages import read_packages
 from git_commands import create_or_update_branch, get_repository, commit_changes, NothingToCommitException, push_changes, \
-    get_changes_to_commit, fetch_tags, fetch_remote, has_remote_branch, has_tag
+    get_changes_to_commit, fetch_tags, fetch_remote, has_remote_branch, has_tag, checkout
 from shell import ShellError
 
 logging.basicConfig(level=logging.INFO)
@@ -79,7 +79,13 @@ def has_unreleased_commits(repo, base_branch: str) -> bool:
     return any(True for _ in repo.iter_commits(rev_range, max_count=1))
 
 
-def preflight_branches(packages: dict[str, str], release_branch: str, base_branch: str, merge: bool) -> list[str]:
+def preflight_branches(
+    packages: dict[str, str],
+    release_branch: str | None,
+    base_branch: str,
+    merge: bool,
+    release_current: bool
+) -> list[str]:
     failed_packages = []
 
     for package, folder in packages.items():
@@ -92,6 +98,9 @@ def preflight_branches(packages: dict[str, str], release_branch: str, base_branc
             if not has_remote_branch(repo, base_branch):
                 logging.error(f'Remote base branch `{base_branch}` does not exist in {package}')
                 failed_packages.append(package)
+                continue
+
+            if release_current:
                 continue
 
             if has_remote_branch(repo, release_branch):
@@ -135,10 +144,10 @@ def preflight_clean_worktrees(packages: dict[str, str]) -> list[str]:
     return failed_packages
 
 
-def preflight_release_tags(packages: dict[str, str], release_name: str, merge: bool) -> list[str]:
+def preflight_release_tags(packages: dict[str, str], release_name: str, merge: bool, release_current: bool) -> list[str]:
     failed_packages = []
 
-    if not merge:
+    if not merge and not release_current:
         return failed_packages
 
     for package, folder in packages.items():
@@ -163,9 +172,11 @@ def plan_package_action(
     package: str,
     folder: str,
     release_name: str,
-    release_branch: str,
+    release_branch: str | None,
     base_branch: str,
     merge: bool,
+    release_current: bool,
+    force_release: bool,
     do_not_release: bool,
     skip_release: bool
 ) -> tuple[str, bool]:
@@ -178,7 +189,19 @@ def plan_package_action(
         if not has_remote_branch(repo, base_branch):
             return f'blocked: remote base branch `{base_branch}` is missing', True
 
-        release_branch_exists = has_remote_branch(repo, release_branch)
+        release_branch_exists = has_remote_branch(repo, release_branch) if release_branch else False
+
+        if release_current:
+            fetch_tags(repo)
+            if has_tag(repo, release_name):
+                return f'blocked: release tag `{release_name}` already exists', True
+            if repo.is_dirty(untracked_files=True):
+                return 'blocked: local changes or untracked files are present', True
+            if force_release:
+                return f'would force-create release `{release_name}` from `{base_branch}`', False
+            if not has_unreleased_commits(repo, base_branch):
+                return f'noop: no unreleased commits on `{base_branch}`', False
+            return f'would create release `{release_name}` from `{base_branch}`', False
 
         if merge:
             fetch_tags(repo)
@@ -229,9 +252,11 @@ def plan_package_action(
 def preview_actions(
     packages: dict[str, str],
     release_name: str,
-    release_branch: str,
+    release_branch: str | None,
     base_branch: str,
     merge: bool,
+    release_current: bool,
+    force_release: bool,
     do_not_release: bool,
     skip_release: bool
 ) -> list[str]:
@@ -245,6 +270,8 @@ def preview_actions(
             release_branch,
             base_branch,
             merge,
+            release_current,
+            force_release,
             do_not_release,
             skip_release
         )
@@ -256,10 +283,12 @@ def preview_actions(
 
 def main(
     release_name: str,
-    branch: str,
+    branch: str | None,
     base_branch: str,
     config_file: str,
     merge: bool,
+    release_current: bool,
+    force_release: bool,
     do_not_release: bool,
     skip_release: bool,
     dry_run: bool = False,
@@ -272,7 +301,8 @@ def main(
     if not config_file:
         raise ValueError('No config file specified.')
 
-    logging.info(f'Preparing release `{release_name}` on branch `{branch}`')
+    target_ref = base_branch if release_current else branch
+    logging.info(f'Preparing release `{release_name}` on branch `{target_ref}`')
     packages = read_packages(config_file)
 
     if dry_run or status:
@@ -282,6 +312,8 @@ def main(
             branch,
             base_branch,
             merge,
+            release_current,
+            force_release,
             do_not_release,
             skip_release
         )
@@ -289,17 +321,17 @@ def main(
             logging.error(f'Preview found blocked packages: {failed_packages}')
         return failed_packages
 
-    failed_packages = preflight_branches(packages, branch, base_branch, merge)
+    failed_packages = preflight_branches(packages, branch, base_branch, merge, release_current)
     if failed_packages:
         logging.error(f'Branch preflight failed for packages: {failed_packages}')
         return failed_packages
 
-    failed_packages = preflight_release_tags(packages, release_name, merge)
+    failed_packages = preflight_release_tags(packages, release_name, merge, release_current)
     if failed_packages:
         logging.error(f'Tag preflight failed for packages: {failed_packages}')
         return failed_packages
 
-    if not merge:
+    if not merge or release_current:
         failed_packages = preflight_clean_worktrees(packages)
         if failed_packages:
             logging.error(f'Worktree preflight failed for packages: {failed_packages}')
@@ -311,7 +343,16 @@ def main(
         original_directory = os.getcwd()
         os.chdir(folder)
         try:
-            if merge:
+            if release_current:
+                repo = get_repository('.')
+                fetch_tags(repo)
+                if not force_release and not has_unreleased_commits(repo, base_branch):
+                    logging.info(f'No unreleased commits found on `{base_branch}` in {package}, skipping release')
+                    continue
+                checkout(repo, package, base_branch)
+                notes = collect_release_notes(repo, base_branch)
+                create_release('.', base_branch, release_name, notes)
+            elif merge:
                 repo = get_repository('.')
                 fetch_tags(repo)
                 has_open_pr = check_for_open_prs('.', branch)
@@ -376,6 +417,8 @@ def run_cli(args=None):
     parser = argparse.ArgumentParser(description='Release script to handle package versions.')
     parser.add_argument('--config', '-c', required=True, help='Path to the config json file')
     parser.add_argument('--merge', action='store_true', help='Merge all open merge requests and create releases')
+    parser.add_argument('--release-current', action='store_true', help='Create releases directly from the current base branch without PRs')
+    parser.add_argument('--force-release', action='store_true', help='Force release creation in --release-current mode even if no unreleased commits are detected')
     parser.add_argument('--no-release', action='store_true', help="Don't create any release")
     parser.add_argument('--skip-release', '-s', action='store_true', help='Skip creating a release if no PR opened')
     parser.add_argument('--dry-run', action='store_true', help='Show planned actions without mutating repositories or GitHub')
@@ -387,8 +430,18 @@ def run_cli(args=None):
 
     if not app_args.base_branch:
         parser.error('--base-branch is required')
-    if not app_args.release_branch:
+    if not app_args.release_current and not app_args.release_branch:
         parser.error('--release-branch is required')
+    if app_args.release_current and app_args.release_branch:
+        parser.error('--release-branch cannot be used with --release-current')
+    if app_args.release_current and app_args.merge:
+        parser.error('--merge cannot be used with --release-current')
+    if app_args.release_current and app_args.skip_release:
+        parser.error('--skip-release cannot be used with --release-current')
+    if app_args.release_current and app_args.no_release:
+        parser.error('--no-release cannot be used with --release-current')
+    if app_args.force_release and not app_args.release_current:
+        parser.error('--force-release can only be used with --release-current')
 
     config_file_path = os.path.abspath(app_args.config)
     working_dir = os.path.dirname(config_file_path)
@@ -400,6 +453,8 @@ def run_cli(args=None):
         app_args.base_branch,
         config_file_path,
         app_args.merge,
+        app_args.release_current,
+        app_args.force_release,
         app_args.no_release,
         app_args.skip_release,
         app_args.dry_run,
