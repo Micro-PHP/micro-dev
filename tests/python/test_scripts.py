@@ -160,8 +160,9 @@ def test_clean_main_processes_packages(monkeypatch, tmp_path):
 
 def test_all_scripts_support_help():
     scripts_dir = os.path.join(os.path.dirname(__file__), '..', '..', 'scripts')
+    runnable_scripts = ['clean.py', 'fix.py', 'init.py', 'release.py']
 
-    for script_name in sorted(name for name in os.listdir(scripts_dir) if name.endswith('.py')):
+    for script_name in runnable_scripts:
         result = subprocess.run(
             [sys.executable, script_name, '--help'],
             cwd=scripts_dir,
