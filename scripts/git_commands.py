@@ -114,6 +114,9 @@ def fetch_tags(repository: Repo):
     repository.git.fetch('--tags')
     logging.info('Fetched remote tags')
 
+def has_tag(repository: Repo, tag_name: str) -> bool:
+    return any(tag.name == tag_name for tag in repository.tags)
+
 def fetch_remote(repository: Repo):
     repository.git.fetch('origin')
     logging.info('Fetched remote branches')

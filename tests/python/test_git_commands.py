@@ -66,6 +66,18 @@ def test_fetch_tags(tmp_path):
     assert any(tag.name == "v1.0.0" for tag in local_repo.tags)
 
 
+def test_has_tag(tmp_path):
+    repo = Repo.init(tmp_path)
+    file_path = tmp_path / "file.txt"
+    file_path.write_text("content")
+    repo.index.add(["file.txt"])
+    repo.index.commit("init")
+    repo.create_tag("v1.0.0")
+
+    assert git_commands.has_tag(repo, "v1.0.0") is True
+    assert git_commands.has_tag(repo, "v1.0.1") is False
+
+
 def test_checkout_fetch_and_checkout_branch(tmp_path):
     remote_dir = tmp_path / "remote"
     remote_repo = Repo.init(remote_dir)

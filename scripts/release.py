@@ -7,7 +7,7 @@ from git import InvalidGitRepositoryError
 from github import create_merge_request, merge_pr, create_release, check_for_open_prs, check_for_merged_prs, check_auth
 from packages import read_packages
 from git_commands import create_or_update_branch, get_repository, commit_changes, NothingToCommitException, push_changes, \
-    get_changes_to_commit, fetch_tags, fetch_remote, has_remote_branch
+    get_changes_to_commit, fetch_tags, fetch_remote, has_remote_branch, has_tag
 from shell import ShellError
 
 logging.basicConfig(level=logging.INFO)
@@ -135,9 +135,34 @@ def preflight_clean_worktrees(packages: dict[str, str]) -> list[str]:
     return failed_packages
 
 
+def preflight_release_tags(packages: dict[str, str], release_name: str, merge: bool) -> list[str]:
+    failed_packages = []
+
+    if not merge:
+        return failed_packages
+
+    for package, folder in packages.items():
+        original_directory = os.getcwd()
+        os.chdir(folder)
+        try:
+            repo = get_repository('.')
+            fetch_tags(repo)
+            if has_tag(repo, release_name):
+                logging.error(f'Release tag `{release_name}` already exists in {package}')
+                failed_packages.append(package)
+        except (ShellError, InvalidGitRepositoryError) as e:
+            logging.error(f'Tag preflight failed for {package}: {e}')
+            failed_packages.append(package)
+        finally:
+            os.chdir(original_directory)
+
+    return failed_packages
+
+
 def plan_package_action(
     package: str,
     folder: str,
+    release_name: str,
     release_branch: str,
     base_branch: str,
     merge: bool,
@@ -157,6 +182,8 @@ def plan_package_action(
 
         if merge:
             fetch_tags(repo)
+            if has_tag(repo, release_name):
+                return f'blocked: release tag `{release_name}` already exists', True
             has_open_pr = check_for_open_prs('.', release_branch)
             has_merged_pr = check_for_merged_prs('.', release_branch)
 
@@ -201,6 +228,7 @@ def plan_package_action(
 
 def preview_actions(
     packages: dict[str, str],
+    release_name: str,
     release_branch: str,
     base_branch: str,
     merge: bool,
@@ -213,6 +241,7 @@ def preview_actions(
         action, is_blocked = plan_package_action(
             package,
             folder,
+            release_name,
             release_branch,
             base_branch,
             merge,
@@ -249,6 +278,7 @@ def main(
     if dry_run or status:
         failed_packages = preview_actions(
             packages,
+            release_name,
             branch,
             base_branch,
             merge,
@@ -262,6 +292,11 @@ def main(
     failed_packages = preflight_branches(packages, branch, base_branch, merge)
     if failed_packages:
         logging.error(f'Branch preflight failed for packages: {failed_packages}')
+        return failed_packages
+
+    failed_packages = preflight_release_tags(packages, release_name, merge)
+    if failed_packages:
+        logging.error(f'Tag preflight failed for packages: {failed_packages}')
         return failed_packages
 
     if not merge:
