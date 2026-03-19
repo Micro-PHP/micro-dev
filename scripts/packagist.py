@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 import requests
 
 def to_ssh(func):
