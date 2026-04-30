@@ -13,32 +13,35 @@
         "php": "^8.2",
         "ext-dom": "*",
         "ext-libxml": "*",
-        "ext-redis": "*",
         "ext-pcntl": "*",
+        "ext-redis": "*",
         "doctrine/orm": "^2",
         "elasticsearch/elasticsearch": "^8",
-        "nette/php-generator": "^4",
-        "psr/log": "^1 || ^2 || ^3",
-        "symfony/property-access": "^5.4 || ^6.1 || ^6.2 || ^6.3",
-        "symfony/finder": "^6.2 || ^6.3",
-        "symfony/validator": "^5.4.15 || ^6",
-        "symfony/console": "^6.0",
-        "symfony/http-foundation": "^6.2 || ^6.3",
-        "symfony/serializer": "^6.2 || ^6.3",
         "firebase/php-jwt": "^6",
-        "php-amqplib/php-amqplib": "^3.1",
-        "php-ffmpeg/php-ffmpeg": "^1.0",
         "league/flysystem": "^3.0",
         "league/oauth2-client": "^2",
-        "psr/cache": "^3.0",
-        "psr/simple-cache": "^3.0",
-        "symfony/cache": "^6",
         "monolog/monolog": "^3",
-        "twig/twig": "^3",
-        "ramsey/uuid": "^4.2"
-    },
-    "replace": {
-        "micro/kernel": "self.version"
+        "nette/php-generator": "^4",
+        "nyholm/psr7": "^1.8",
+        "php-amqplib/php-amqplib": "^3.1",
+        "php-ffmpeg/php-ffmpeg": "^1.0",
+        "psr/cache": "^3.0",
+        "psr/container": "^2.0",
+        "psr/log": "^1 || ^2 || ^3",
+        "psr/simple-cache": "^3.0",
+        "ramsey/uuid": "^4.2",
+        "spiral/roadrunner": "^2025.1.13",
+        "spiral/tokenizer": ">=2.7",
+        "symfony/cache": "^6",
+        "symfony/console": "^6.0",
+        "symfony/finder": "^6",
+        "symfony/http-foundation": "^6.2",
+        "symfony/property-access": "^5.4 || ^6",
+        "symfony/psr-http-message-bridge": "^2.3",
+        "symfony/serializer": "^6.2",
+        "symfony/validator": "^5.4 || ^6",
+        "temporal/sdk": ">=2.0",
+        "twig/twig": "^3"
     },
     "require-dev": {
         "ergebnis/composer-normalize": "^2.34",
@@ -47,6 +50,10 @@
         "symfony/intl": "^5.4 || ^6",
         "symfony/var-dumper": "^5.4 || ^6"
     },
+    "replace": {
+        "micro/kernel": "self.version"
+    },
+    "minimum-stability": "dev",
     "autoload": {
         "psr-4": {
             "Micro\\Framework\\": "src/Micro/Framework",
@@ -60,7 +67,6 @@
             "php-http/discovery": true
         }
     },
-    "minimum-stability": "dev",
     "scripts": {
         "post-install-cmd": [
             "@auto-scripts"
@@ -68,8 +74,7 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
-        "auto-scripts": [
-        ],
+        "auto-scripts": [],
         "front-build": [
             "yarn install",
             "yarn build"
@@ -80,17 +85,17 @@
             "@test-php-cs-try",
             "@test-unit"
         ],
+        "test-php-cs-fix": [
+            "php tests/tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --verbose --using-cache=no"
+        ],
+        "test-php-cs-try": [
+            "php tests/tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --verbose --dry-run --using-cache=no"
+        ],
         "test-phpstan": [
             "php tests/tools/phpstan/vendor/bin/phpstan"
         ],
         "test-psalm": [
             "php tests/tools/psalm/vendor/bin/psalm"
-        ],
-        "test-php-cs-try": [
-            "php tests/tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --verbose --dry-run --using-cache=no"
-        ],
-        "test-php-cs-fix": [
-            "php tests/tools/php-cs-fixer/vendor/bin/php-cs-fixer fix --verbose --using-cache=no"
         ],
         "test-unit": [
             "php vendor/bin/phpunit"
