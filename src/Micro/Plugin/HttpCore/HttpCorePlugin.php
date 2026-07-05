@@ -15,7 +15,7 @@ namespace Micro\Plugin\HttpCore;
 
 use Micro\Framework\Autowire\AutowireHelperFactory;
 use Micro\Framework\Autowire\AutowireHelperFactoryInterface;
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
@@ -55,9 +55,9 @@ class HttpCorePlugin implements DependencyProviderInterface, ConfigurableInterfa
 
     private KernelInterface $kernel;
 
-    private Container $container;
+    private MutableContainerInterface $container;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $this->container = $container;
 

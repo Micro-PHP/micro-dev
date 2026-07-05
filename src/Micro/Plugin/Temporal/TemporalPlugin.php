@@ -2,9 +2,9 @@
 
 namespace Micro\Plugin\Temporal;
 
-use Micro\Component\DependencyInjection\Autowire\AutowireHelperFactory;
-use Micro\Component\DependencyInjection\Autowire\AutowireHelperFactoryInterface;
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\Autowire\AutowireHelperFactory;
+use Micro\Framework\Autowire\AutowireHelperFactoryInterface;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
@@ -36,25 +36,13 @@ class TemporalPlugin implements DependencyProviderInterface, ConfigurableInterfa
 {
     use PluginConfigurationTrait;
 
-    /**
-     * @var SerializerFacadeInterface|null
-     */
     private ?SerializerFacadeInterface $serializerFacade = null;
 
-    /**
-     * @var LocatorFacadeInterface|null
-     */
     private ?LocatorFacadeInterface $locatorFacade = null;
 
-    /**
-     * @var AutowireHelperFactoryInterface|null
-     */
     private ?AutowireHelperFactoryInterface $autowireHelperFactory = null;
 
-    /**
-     * {@inheritDoc}
-     */
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(TemporalFacadeInterface::class, function (
             SerializerFacadeInterface $serializerFacade,
@@ -68,9 +56,6 @@ class TemporalPlugin implements DependencyProviderInterface, ConfigurableInterfa
         });
     }
 
-    /**
-     * @return TemporalFacadeInterface
-     */
     protected function createFacade(): TemporalFacadeInterface
     {
         return new TemporalFacade(
@@ -80,25 +65,16 @@ class TemporalPlugin implements DependencyProviderInterface, ConfigurableInterfa
         );
     }
 
-    /**
-     * @return ClientFactoryInterface
-     */
     protected function createWorkflowClientFactory(): ClientFactoryInterface
     {
         return new ClientFactory($this->createDataConverterFactory());
     }
 
-    /**
-     * @return DataConverterFactoryInterface
-     */
     protected function createDataConverterFactory(): DataConverterFactoryInterface
     {
         return new DataConverterFactory($this->serializerFacade);
     }
 
-    /**
-     * @return ClientRepositoryFactoryInterface
-     */
     protected function createWorkflowClientRepositoryFactory(): ClientRepositoryFactoryInterface
     {
         return new ClientRepositoryFactory(
@@ -107,9 +83,6 @@ class TemporalPlugin implements DependencyProviderInterface, ConfigurableInterfa
         );
     }
 
-    /**
-     * @return ClientRepositoryInterface
-     */
     protected function createWorkflowClientRepository(): ClientRepositoryInterface
     {
         return $this->createWorkflowClientRepositoryFactory()->create();
@@ -123,17 +96,11 @@ class TemporalPlugin implements DependencyProviderInterface, ConfigurableInterfa
         );
     }
 
-    /**
-     * @return ActivityStubFactoryInterface
-     */
     protected function createActivityStubFactory(): ActivityStubFactoryInterface
     {
         return new ActivityStubFactory();
     }
 
-    /**
-     * @return WorkerFactoryInterface
-     */
     protected function createWorkerFactory(): WorkerFactoryInterface
     {
         return new WorkerFactory(
@@ -144,9 +111,6 @@ class TemporalPlugin implements DependencyProviderInterface, ConfigurableInterfa
         );
     }
 
-    /**
-     * @return EnvironmentExpanderFactoryInterface
-     */
     protected function createRREnvironmentExpanderFactory(): EnvironmentExpanderFactoryInterface
     {
         return new EnvironmentExpanderFactory($this->configuration());

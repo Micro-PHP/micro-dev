@@ -2,7 +2,7 @@
 
 namespace Micro\Plugin\Security;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
@@ -23,7 +23,7 @@ class SecurityPlugin implements DependencyProviderInterface, ConfigurableInterfa
 {
     use PluginConfigurationTrait;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(SecurityFacadeInterface::class, function () {
             return $this->createSecurityFacade();

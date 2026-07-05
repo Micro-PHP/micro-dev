@@ -85,7 +85,8 @@ class Locator implements LocatorInterface
         $finder = new Finder();
         try {
             $finder
-                ->in($pluginBasePath.'/**')
+                ->in($pluginBasePath)
+                ->exclude(['Tests', 'tests'])
                 ->name('*.php')
                 ->notName('*Interface.php');
         } catch (\Throwable $exception) {

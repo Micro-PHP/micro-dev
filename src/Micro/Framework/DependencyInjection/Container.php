@@ -12,17 +12,17 @@
 namespace Micro\Framework\DependencyInjection;
 
 use Micro\Framework\DependencyInjection\Exception\ServiceNotRegisteredException;
+use Micro\Framework\DependencyInjection\Exception\ServiceDecorationException;
 use Micro\Framework\DependencyInjection\Exception\ServiceRegistrationException;
-use Psr\Container\ContainerInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 /**
  * @author Stanislau Komar <head.trackingsoft@gmail.com>
  */
-class Container implements ContainerInterface, ContainerRegistryInterface, ContainerDecoratorInterface
+class Container implements MutableContainerInterface
 {
-    /**
-     * @var array<class-string, mixed>
-     */
+    /** @var array<string, object> */
     private array $services = [];
 
     /**
@@ -35,6 +35,14 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
      */
     private array $decorators = [];
 
+    /** @param iterable<string, object> $services */
+    public function __construct(iterable $services = [])
+    {
+        foreach ($services as $id => $service) {
+            $this->set($id, $service);
+        }
+    }
+
     /**
      * @psalm-suppress MoreSpecificImplementedParamType
      * @psalm-suppress MixedPropertyTypeCoercion
@@ -43,11 +51,16 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
      *
      * @param class-string<T> $id
      *
-     * @psalm-return T
+     * @return object
+     *
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public function get(string $id): object
     {
-        if (!empty($this->services[$id])) {
+        if (\array_key_exists($id, $this->services)) {
+            $this->applyDecorators($id);
+
             return $this->services[$id];
         }
 
@@ -63,7 +76,17 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
      */
     public function has(string $id): bool
     {
-        return !empty($this->servicesRaw[$id]) || !empty($this->services[$id]);
+        return \array_key_exists($id, $this->servicesRaw)
+            || \array_key_exists($id, $this->services);
+    }
+
+    public function set(string $id, object $service): void
+    {
+        if ($this->has($id)) {
+            throw new ServiceRegistrationException(sprintf('Service "%s" already registered', $id));
+        }
+
+        $this->services[$id] = $service;
     }
 
     /**
@@ -106,19 +129,32 @@ class Container implements ContainerInterface, ContainerRegistryInterface, Conta
         $service = $raw($this);
         $this->services[$serviceId] = $service;
 
+        $this->applyDecorators($serviceId);
+    }
+
+    private function applyDecorators(string $serviceId): void
+    {
         if (!\array_key_exists($serviceId, $this->decorators)) {
             return;
         }
 
         $decoratorsByPriority = $this->decorators[$serviceId];
+        unset($this->decorators[$serviceId]);
         krsort($decoratorsByPriority);
 
         foreach ($decoratorsByPriority as $decorators) {
             foreach ($decorators as $decorator) {
-                $this->services[$serviceId] = $decorator($this->services[$serviceId], $this);
+                $decorated = $decorator(
+                    $this->services[$serviceId],
+                    $this
+                );
+
+                if (!\is_object($decorated)) {
+                    throw new ServiceDecorationException($serviceId, $decorated);
+                }
+
+                $this->services[$serviceId] = $decorated;
             }
         }
-
-        unset($this->decorators[$serviceId]);
     }
 }

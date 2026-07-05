@@ -11,6 +11,7 @@
 
 namespace Micro\Framework\KernelApp;
 
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
 
@@ -69,6 +70,8 @@ use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
  */
 interface AppKernelInterface extends KernelInterface
 {
+    public function container(): MutableContainerInterface;
+
     public function environment(): string;
 
     public function isDevMode(): bool;

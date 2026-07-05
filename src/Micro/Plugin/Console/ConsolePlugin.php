@@ -13,7 +13,7 @@ namespace Micro\Plugin\Console;
 
 use Micro\Framework\Autowire\AutowireHelperFactory;
 use Micro\Framework\Autowire\AutowireHelperFactoryInterface;
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Plugin\Console\Business\Factory\ConsoleApplicationFactory;
 use Micro\Plugin\Console\Business\Factory\ConsoleApplicationFactoryInterface;
@@ -90,12 +90,12 @@ class ConsolePlugin implements DependencyProviderInterface
 
     private AutowireHelperFactoryInterface $autowireHelperFactory;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(
             ConsoleApplicationFacadeInterface::class, function (
                 LocatorFacadeInterface $locatorFacade,
-                Container $container
+                MutableContainerInterface $container
             ): ConsoleApplicationFacadeInterface {
                 $this->locatorFacade = $locatorFacade;
                 $this->autowireHelperFactory = new AutowireHelperFactory($container);

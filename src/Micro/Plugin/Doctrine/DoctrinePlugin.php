@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Doctrine;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
@@ -45,7 +45,7 @@ class DoctrinePlugin implements DependencyProviderInterface, ConfigurableInterfa
 
     private KernelInterface $kernel;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(DoctrineFacadeInterface::class, function (KernelInterface $kernel): DoctrineFacadeInterface {
             $this->kernel = $kernel;

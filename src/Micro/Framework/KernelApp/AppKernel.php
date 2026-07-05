@@ -11,7 +11,10 @@
 
 namespace Micro\Framework\KernelApp;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\Autowire\Builder\AutowireContainerBuilder;
+use Micro\Framework\Autowire\Builder\AutowireContainerBuilderInterface;
+use Micro\Framework\Autowire\Definition\AutowiredClassDefinition;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootConfiguration\Boot\ConfigurationProviderBootLoader;
 use Micro\Framework\BootPluginDependent\Boot\DependedPluginsBootLoader;
 use Micro\Framework\BootDependency\Boot\DependencyProviderBootLoader;
@@ -55,7 +58,7 @@ class AppKernel implements AppKernelInterface
     /**
      * {@inheritDoc}
      */
-    public function container(): Container
+    public function container(): MutableContainerInterface
     {
         return $this->kernel()->container();
     }
@@ -63,7 +66,7 @@ class AppKernel implements AppKernelInterface
     /**
      * {@inheritDoc}
      */
-    public function plugins(string $pluginInterface = null): \Traversable
+    public function plugins(?string $pluginInterface = null): \Traversable
     {
         return $this->kernel()->plugins($pluginInterface);
     }
@@ -136,20 +139,27 @@ class AppKernel implements AppKernelInterface
 
     protected function createKernel(): KernelInterface
     {
-        $container = new Container();
-        $plugins = $this->plugins;
+        $plugins = array_unique([
+            EventEmitterPlugin::class,
+            LocatorPlugin::class,
+            ...$this->plugins,
+        ]);
         $this->plugins = [];
+
+        $containerBuilder = $this->createContainerBuilder();
+        foreach ($plugins as $pluginClass) {
+            $containerBuilder->autowiredClass(new AutowiredClassDefinition(
+                id: $pluginClass,
+                class: $pluginClass
+            ));
+        }
+        $container = $containerBuilder->build();
 
         return $this
             ->createKernelBuilder()
             ->setContainer($container)
             ->addBootLoaders($this->createBootLoaderCollection($container))
-            ->setApplicationPlugins(array_unique([
-                    EventEmitterPlugin::class,
-                    LocatorPlugin::class,
-                    ...$plugins,
-                ])
-            )
+            ->setApplicationPlugins($plugins)
             ->build();
     }
 
@@ -179,6 +189,11 @@ class AppKernel implements AppKernelInterface
         return new KernelBuilder();
     }
 
+    protected function createContainerBuilder(): AutowireContainerBuilderInterface
+    {
+        return new AutowireContainerBuilder();
+    }
+
     protected function createInitActionProcessor(): KernelActionProcessorInterface
     {
         return new KernelRunActionProcessor();
@@ -192,9 +207,9 @@ class AppKernel implements AppKernelInterface
     /**
      * @return PluginBootLoaderInterface[]
      */
-    protected function createBootLoaderCollection(Container $container): array
+    protected function createBootLoaderCollection(MutableContainerInterface $container): array
     {
-        $bl = $this->additionalBootLoaders;
+        $bootLoaders = $this->additionalBootLoaders;
 
         $this->additionalBootLoaders = [];
 
@@ -202,7 +217,7 @@ class AppKernel implements AppKernelInterface
             new ConfigurationProviderBootLoader($this->configuration),
             new DependencyProviderBootLoader($container),
             new DependedPluginsBootLoader($this),
-            ...$bl,
+            ...$bootLoaders,
         ];
     }
 

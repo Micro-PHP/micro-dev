@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Elastic;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
@@ -38,7 +38,7 @@ class ElasticPlugin implements DependencyProviderInterface, ConfigurableInterfac
      */
     private LoggerFacadeInterface $loggerFacade;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(ElasticFacadeInterface::class, function (
             LoggerFacadeInterface $loggerFacade

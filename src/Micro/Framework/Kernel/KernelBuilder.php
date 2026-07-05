@@ -11,7 +11,7 @@
 
 namespace Micro\Framework\Kernel;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\Builder\ContainerBuilder;
 use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
 use Psr\Container\ContainerInterface;
 
@@ -27,7 +27,7 @@ class KernelBuilder
      */
     private array $bootLoaderPluginCollection;
 
-    private ?Container $container;
+    private ?ContainerInterface $container;
 
     public function __construct()
     {
@@ -73,7 +73,7 @@ class KernelBuilder
     }
 
     /**
-     * @param Container $container
+     * @param ContainerInterface $container
      *
      * @return $this
      */
@@ -84,9 +84,9 @@ class KernelBuilder
         return $this;
     }
 
-    protected function container(): Container
+    protected function container(): ContainerInterface
     {
-        return $this->container ?? new Container();
+        return $this->container ?? (new ContainerBuilder())->build();
     }
 
     /**

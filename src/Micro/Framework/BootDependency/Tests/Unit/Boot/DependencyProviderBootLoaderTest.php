@@ -12,8 +12,10 @@
 namespace Micro\Framework\BootDependency\Tests\Unit\Boot;
 
 use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\Autowire\ContainerAutowire;
 use Micro\Framework\BootDependency\Boot\DependencyProviderBootLoader;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use PHPUnit\Framework\TestCase;
 
 class DependencyProviderBootLoaderTest extends TestCase
@@ -39,5 +41,22 @@ class DependencyProviderBootLoaderTest extends TestCase
         foreach ([$pluginMock, $pluginNotDependencyProvider] as $plugin) {
             $dataProviderBootLoader->boot($plugin);
         }
+    }
+
+    public function testProvidesAutowiringContainerThroughMutableContract(): void
+    {
+        $bootLoader = new DependencyProviderBootLoader(new Container());
+        $plugin = new class() implements DependencyProviderInterface {
+            public ?MutableContainerInterface $container = null;
+
+            public function provideDependencies(MutableContainerInterface $container): void
+            {
+                $this->container = $container;
+            }
+        };
+
+        $bootLoader->boot($plugin);
+
+        self::assertInstanceOf(ContainerAutowire::class, $plugin->container);
     }
 }

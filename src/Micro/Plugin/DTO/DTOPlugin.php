@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\DTO;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
@@ -43,7 +43,7 @@ class DTOPlugin implements DependencyProviderInterface, ConfigurableInterface, P
 
     private LoggerFacadeInterface $loggerFacade;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(DTOFacadeInterface::class, function (
             AppKernelInterface $kernel,

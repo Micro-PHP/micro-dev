@@ -11,8 +11,10 @@
 
 namespace Micro\Framework\Kernel;
 
-use Micro\Framework\DependencyInjection\Container;
 use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 class Kernel implements KernelInterface
 {
@@ -30,7 +32,7 @@ class Kernel implements KernelInterface
     public function __construct(
         private readonly array $pluginCollection,
         private array $pluginBootLoaderCollection,
-        private readonly Container $container
+        private readonly ContainerInterface $container
     ) {
         $this->isStarted = false;
         $this->plugins = [];
@@ -74,7 +76,7 @@ class Kernel implements KernelInterface
     /**
      * {@inheritDoc}
      */
-    public function container(): Container
+    public function container(): ContainerInterface
     {
         return $this->container;
     }
@@ -88,19 +90,22 @@ class Kernel implements KernelInterface
             return;
         }
 
-        $plugin = new $pluginClass();
+        try {
+            $plugin = $this->container->get($pluginClass);
+            foreach ($this->pluginBootLoaderCollection as $bootLoader) {
+                $bootLoader->boot($plugin);
+            }
 
-        foreach ($this->pluginBootLoaderCollection as $bootLoader) {
-            $bootLoader->boot($plugin);
+            $this->plugins[$pluginClass] = $plugin;
+        } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
+            // Silently skip for now
         }
-
-        $this->plugins[$pluginClass] = $plugin;
     }
 
     /**
      * {@inheritDoc}
      */
-    public function plugins(string $pluginInterface = null): \Traversable
+    public function plugins(?string $pluginInterface = null): \Traversable
     {
         foreach ($this->plugins as $plugin) {
             if (!$pluginInterface || ($plugin instanceof $pluginInterface)) {

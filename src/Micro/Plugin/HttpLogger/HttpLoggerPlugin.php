@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpLogger;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
@@ -49,7 +49,7 @@ class HttpLoggerPlugin implements DependencyProviderInterface, PluginDependedInt
     private HttpFacadeInterface $httpFacade;
     private LoggerFacadeInterface $loggerFacade;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->decorate(HttpFacadeInterface::class, function (
             HttpFacadeInterface $httpFacade,

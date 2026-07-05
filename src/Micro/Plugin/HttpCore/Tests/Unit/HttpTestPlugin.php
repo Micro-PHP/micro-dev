@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpCore\Tests\Unit;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootPluginDependent\Plugin\PluginDependedInterface;
 use Micro\Plugin\HttpCore\Business\Locator\RouteLocatorInterface;
@@ -31,7 +31,7 @@ use Symfony\Component\HttpFoundation\Response;
  */
 class HttpTestPlugin implements DependencyProviderInterface, HttpResponseTransformerPlugin, HttpRouteLocatorPluginInterface, PluginDependedInterface
 {
-    private Container $container;
+    private MutableContainerInterface $container;
 
     public function weight(): int
     {
@@ -86,7 +86,7 @@ class HttpTestPlugin implements DependencyProviderInterface, HttpResponseTransfo
     public function createLocator(): RouteLocatorInterface
     {
         return new class($this->container) implements RouteLocatorInterface {
-            public function __construct(private Container $container)
+            public function __construct(private MutableContainerInterface $container)
             {
             }
 
@@ -103,7 +103,7 @@ class HttpTestPlugin implements DependencyProviderInterface, HttpResponseTransfo
         };
     }
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $this->container = $container;
     }

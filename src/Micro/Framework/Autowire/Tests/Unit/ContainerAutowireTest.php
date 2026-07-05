@@ -49,6 +49,17 @@ class ContainerAutowireTest extends TestCase
 
         $this->assertInstanceOf(NewDecoratorForDefault::class, $this->container->get(AutowireService::class));
     }
+
+    public function testResolvesUnregisteredClass(): void
+    {
+        $container = new ContainerAutowire(new Container());
+
+        self::assertTrue($container->has(AutowireServiceArgument::class));
+        self::assertInstanceOf(
+            AutowireServiceArgument::class,
+            $container->get(AutowireServiceArgument::class)
+        );
+    }
 }
 
 class NewDecoratorForDefault extends AutowireService

@@ -11,7 +11,7 @@
 
 namespace Micro\Plugin\ConfigurationHelper;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\KernelApp\AppKernelInterface;
@@ -25,7 +25,7 @@ use Micro\Plugin\ConfigurationHelper\Facade\ConfigurationHelperFacadeInterface;
 
 class ConfigurationHelperPlugin implements DependencyProviderInterface
 {
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(ConfigurationHelperFacadeInterface::class, function (AppKernelInterface $kernel) {
             return $this->createFacade($kernel);

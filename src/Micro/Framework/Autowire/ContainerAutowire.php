@@ -11,13 +11,13 @@
 
 namespace Micro\Framework\Autowire;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 
-class ContainerAutowire extends Container
+class ContainerAutowire implements MutableContainerInterface
 {
     private AutowireHelperFactoryInterface $autowireHelperFactory;
 
-    public function __construct(private readonly Container $container)
+    public function __construct(private readonly MutableContainerInterface $container)
     {
         $this->autowireHelperFactory = new AutowireHelperFactory($this->container);
     }
@@ -27,6 +27,13 @@ class ContainerAutowire extends Container
      */
     public function get(string $id): object
     {
+        if (class_exists($id) && !$this->container->has($id)) {
+            $this->container->register(
+                $id,
+                $this->autowireHelperFactory->create()->autowire($id)
+            );
+        }
+
         return $this->container->get($id);
     }
 
@@ -35,7 +42,7 @@ class ContainerAutowire extends Container
      */
     public function has(string $id): bool
     {
-        return $this->container->has($id);
+        return $this->container->has($id) || class_exists($id);
     }
 
     /**

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Redis;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
@@ -31,13 +31,13 @@ class RedisPlugin implements DependencyProviderInterface, ConfigurableInterface
 {
     use PluginConfigurationTrait;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(RedisFacadeInterface::class, function (): Facade\RedisFacadeInterface {
             return $this->createRedisFacade();
         });
 
-        $container->register(RedisFacadeInterface::class, function (Container $container) {
+        $container->register(RedisFacadeInterface::class, function (MutableContainerInterface $container) {
             return $container->get(RedisFacadeInterface::class);
         });
     }

@@ -12,6 +12,7 @@
 namespace Micro\Framework\DependencyInjection\Tests\Unit;
 
 use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\Exception\ServiceDecorationException;
 use Micro\Framework\DependencyInjection\Exception\ServiceNotRegisteredException;
 use Micro\Framework\DependencyInjection\Exception\ServiceRegistrationException;
 use PHPUnit\Framework\TestCase;
@@ -84,7 +85,7 @@ class ContainerTest extends TestCase
         $container->get(NamedInterface::class);
     }
 
-    public function testUnregisteredException()
+    public function testUnregisteredException(): void
     {
         $container = new Container();
         $service = 'UnresolvedService';
@@ -129,35 +130,26 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(NamedInterface::class, $result);
         $this->assertEquals('ABCDE', $result->getName());
     }
-}
 
-interface NamedInterface
-{
-    public function getName(): string;
-}
-
-readonly class NamedService implements NamedInterface
-{
-    public function __construct(private string $name)
+    public function testDecoratorMustReturnObject(): void
     {
-    }
+        $service = new NamedService('A');
+        $container = new Container([NamedInterface::class => $service]);
+        $container->decorate(
+            NamedInterface::class,
+            static fn (): string => 'invalid'
+        );
 
-    public function getName(): string
-    {
-        return $this->name;
-    }
-}
+        try {
+            $container->get(NamedInterface::class);
+            self::fail('Expected decorator validation to fail.');
+        } catch (ServiceDecorationException $exception) {
+            self::assertSame(
+                'Decorator for service "'.NamedInterface::class.'" must return an object, string returned.',
+                $exception->getMessage()
+            );
+        }
 
-readonly class NamedServiceDecorator implements NamedInterface
-{
-    public function __construct(
-        private object $decorated,
-        private string $name
-    ) {
-    }
-
-    public function getName(): string
-    {
-        return $this->decorated->getName().$this->name;
+        self::assertSame($service, $container->get(NamedInterface::class));
     }
 }

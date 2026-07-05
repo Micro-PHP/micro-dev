@@ -11,9 +11,9 @@
 
 namespace Micro\Framework\BootDependency\Plugin;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 
 interface DependencyProviderInterface
 {
-    public function provideDependencies(Container $container): void;
+    public function provideDependencies(MutableContainerInterface $container): void;
 }

@@ -12,7 +12,7 @@
 namespace Micro\Plugin\EventEmitter;
 
 use Micro\Framework\Autowire\AutowireHelperInterface;
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\EventEmitter\EventEmitterFactoryInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Plugin\EventEmitter\Business\Facade\EventsFacade;
@@ -29,7 +29,7 @@ class EventEmitterPlugin implements DependencyProviderInterface
 
     private AutowireHelperInterface $autowireHelper;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(EventsFacadeInterface::class, function (
             AutowireHelperInterface $autowireHelper,

@@ -11,7 +11,7 @@
 
 namespace Micro\Plugin\LoggerMonolog\Business\Handler\Type;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Plugin\Logger\Configuration\LoggerProviderTypeConfigurationInterface;
 use Micro\Plugin\LoggerMonolog\Business\Handler\HandlerInterface;
 use Micro\Plugin\LoggerMonolog\Configuration\Handler\HandlerConfigurationInterface;
@@ -26,7 +26,7 @@ use Monolog\Level;
 abstract class AbstractHandler extends AbstractProcessingHandler implements HandlerInterface
 {
     public function __construct(
-        protected readonly Container $container,
+        protected readonly MutableContainerInterface $container,
         protected readonly HandlerConfigurationInterface $handlerConfiguration,
         protected readonly LoggerProviderTypeConfigurationInterface $loggerProviderTypeConfiguration
     ) {

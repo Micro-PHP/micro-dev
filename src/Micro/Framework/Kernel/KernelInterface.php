@@ -11,8 +11,8 @@
 
 namespace Micro\Framework\Kernel;
 
-use Micro\Framework\DependencyInjection\Container;
 use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
+use Psr\Container\ContainerInterface;
 
 /**
  * The kernel is needed for plugin management. A plugin can be any class object.
@@ -24,7 +24,7 @@ interface KernelInterface
      *
      * @api
      */
-    public function container(): Container;
+    public function container(): ContainerInterface;
 
     /**
      * @throws \RuntimeException
@@ -61,5 +61,5 @@ interface KernelInterface
      *
      * @api
      */
-    public function plugins(string $pluginInterface = null): \Traversable;
+    public function plugins(?string $pluginInterface = null): \Traversable;
 }

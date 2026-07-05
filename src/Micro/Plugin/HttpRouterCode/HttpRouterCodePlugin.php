@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpRouterCode;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootPluginDependent\Plugin\PluginDependedInterface;
@@ -31,9 +31,9 @@ readonly class HttpRouterCodePlugin implements HttpRouteLocatorPluginInterface, 
     /**
      * @phpstan-ignore-next-line
      */
-    private Container $container;
+    private MutableContainerInterface $container;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         // @phpstan-ignore-next-line
         $this->container = $container;

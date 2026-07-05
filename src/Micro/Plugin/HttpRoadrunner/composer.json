@@ -15,7 +15,7 @@
         "micro/plugin-event-emitter": "^1.6",
         "micro/plugin-http-core": "^1.6",
         "nyholm/psr7": "^1.8",
-        "spiral/roadrunner": "^v2025.1.13",
+        "spiral/roadrunner": "^2.0",
         "symfony/psr-http-message-bridge": "^2.3"
     },
     "minimum-stability": "dev",

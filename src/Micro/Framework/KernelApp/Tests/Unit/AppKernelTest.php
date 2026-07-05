@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Micro\Framework\KernelApp\Tests\Unit;
 
+use Micro\Framework\Autowire\Builder\AutowireContainerBuilder;
+use Micro\Framework\Autowire\Builder\AutowireContainerBuilderInterface;
 use Micro\Framework\DependencyInjection\Container;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
@@ -49,6 +51,31 @@ class AppKernelTest extends TestCase
         $this->assertInstanceOf(Container::class, $app->container());
 
         $app->terminate();
+    }
+
+    public function testCreateKernelUsesContainerBuilderForPlugins(): void
+    {
+        $app = new class([], [\stdClass::class]) extends AppKernel {
+            public bool $containerBuilderCreated = false;
+
+            public function buildKernel(): KernelInterface
+            {
+                return $this->createKernel();
+            }
+
+            protected function createContainerBuilder(): AutowireContainerBuilderInterface
+            {
+                $this->containerBuilderCreated = true;
+
+                return new AutowireContainerBuilder();
+            }
+        };
+
+        $kernel = $app->buildKernel();
+
+        self::assertTrue($app->containerBuilderCreated);
+        self::assertTrue($kernel->container()->has(\stdClass::class));
+        self::assertInstanceOf(\stdClass::class, $kernel->container()->get(\stdClass::class));
     }
 
     public function testAddBootLoader()

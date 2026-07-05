@@ -14,8 +14,11 @@ declare(strict_types=1);
 namespace Micro\Plugin\Locator\Tests\Unit;
 
 use Micro\Framework\KernelApp\AppKernel;
+use Micro\Framework\Kernel\KernelInterface;
 use Micro\Plugin\EventEmitter\Business\Locator\EventListenerClassLocatorInterface;
+use Micro\Plugin\EventEmitter\EventEmitterPlugin;
 use Micro\Plugin\Locator\Facade\LocatorFacadeInterface;
+use Micro\Plugin\Locator\Locator\Locator;
 use PHPUnit\Framework\TestCase;
 
 class LocatorPluginTest extends TestCase
@@ -44,5 +47,28 @@ class LocatorPluginTest extends TestCase
         }
 
         $this->assertTrue((bool) $i);
+    }
+
+    public function testPluginClassDiscoveryExcludesTestsDirectories(): void
+    {
+        $locator = new class($this->createMock(KernelInterface::class)) extends Locator {
+            /**
+             * @return list<class-string>
+             */
+            public function pluginClasses(object $plugin): array
+            {
+                return iterator_to_array(
+                    $this->getPluginClasses(new \ReflectionClass($plugin)),
+                    false
+                );
+            }
+        };
+
+        $classes = $locator->pluginClasses(new EventEmitterPlugin());
+
+        self::assertNotEmpty($classes);
+        foreach ($classes as $class) {
+            self::assertStringNotContainsString('\\Tests\\', $class);
+        }
     }
 }

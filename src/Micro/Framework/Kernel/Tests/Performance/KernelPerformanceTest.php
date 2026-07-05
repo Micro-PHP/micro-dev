@@ -10,7 +10,8 @@ use PHPUnit\Framework\TestCase;
 
 class KernelPerformanceTest extends TestCase
 {
-    public function testTime() {
+    public function testTime(): void
+    {
         $plugins = [
             DummyServicePlugin::class,
         ];
@@ -20,12 +21,12 @@ class KernelPerformanceTest extends TestCase
             eval("
                 namespace DynamicNamespace {
                     use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
-                    use Micro\Framework\DependencyInjection\Container;
+                    use Micro\Framework\DependencyInjection\MutableContainerInterface;
                     use Micro\Framework\Kernel\Tests\DummyDecoratorPlugin\DummyDecoratorService;
                     
                     class $className implements DependencyProviderInterface
                     {
-                        public function provideDependencies(Container \$container): void
+                        public function provideDependencies(MutableContainerInterface \$container): void
                         {
                             \$container->decorate(DummyServiceInterface::class, function (DummyServiceInterface \$decorated): DummyServiceInterface {
                                 return new DummyDecoratorService(\$decorated);

@@ -16,7 +16,7 @@ use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
 
-class AutowireHelper implements AutowireHelperInterface
+readonly class AutowireHelper implements AutowireHelperInterface
 {
     public function __construct(private ContainerInterface $container)
     {
@@ -37,7 +37,7 @@ class AutowireHelper implements AutowireHelperInterface
                 if ($target instanceof \Closure) {
                     $arguments = $this->resolveArguments($target);
 
-                    return \call_user_func($target, ...$arguments);
+                    return $target(...$arguments);
                 }
 
                 if (\is_string($target) && class_exists($target)) {
@@ -49,7 +49,7 @@ class AutowireHelper implements AutowireHelperInterface
                 if (\is_object($target) && \is_callable($target)) {
                     $arguments = $this->resolveArguments([$target, '__invoke']);
 
-                    return \call_user_func($target, ...$arguments);
+                    return $target(...$arguments);
                 }
 
                 if (!\is_array($target)) {
@@ -79,7 +79,7 @@ class AutowireHelper implements AutowireHelperInterface
                 }
 
                 if (($object instanceof \Closure) && !$method) {
-                    return \call_user_func($object, ...$arguments);
+                    return $object(...$arguments);
                 }
 
                 if (!$object || !$method) {
@@ -94,15 +94,17 @@ class AutowireHelper implements AutowireHelperInterface
                     $this->throwAutowireException($target, '');
                 }
 
-                return \call_user_func([$object, $method], ...$arguments); // @phpstan-ignore-line
+                return [$object, $method]([$object, $method], ...$arguments); // @phpstan-ignore-line
             } catch (\InvalidArgumentException $exception) {
                 $this->throwAutowireException($target, '', $exception);
-            } catch (AutowireException $exception) {
-                throw $exception;
             }
         };
     }
 
+    /**
+     * @throws ContainerExceptionInterface
+     * @throws \ReflectionException
+     */
     protected function resolveStringAsObject(string $target): object
     {
         if (!class_exists($target)) {
@@ -117,7 +119,7 @@ class AutowireHelper implements AutowireHelperInterface
      *
      * @phpstan-ignore-next-line
      */
-    protected function throwAutowireException(string|array|callable $target, string $message, \Throwable $parent = null): void
+    protected function throwAutowireException(string|array|callable|null $target, string $message, \Throwable $parent = null): void
     {
         if (\is_array($target)) {
             $target = $target[0] ?? null;
@@ -136,6 +138,8 @@ class AutowireHelper implements AutowireHelperInterface
 
     /**
      * @phpstan-ignore-next-line
+     *
+     * @throws \ReflectionException
      */
     protected function resolveArguments(string|array|object $target, ?string $method = null): array
     {
@@ -162,7 +166,7 @@ class AutowireHelper implements AutowireHelperInterface
     }
 
     /**
-     * @throws \Psr\Container\ContainerExceptionInterface
+     * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      *
      * @phpstan-ignore-next-line
@@ -200,7 +204,7 @@ class AutowireHelper implements AutowireHelperInterface
                 continue;
             }
 
-            if (\in_array(ContainerInterface::class, $classImplements)) {
+            if (\in_array(ContainerInterface::class, $classImplements, true)) {
                 $arguments[] = $this->container;
 
                 continue;

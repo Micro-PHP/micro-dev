@@ -2,7 +2,7 @@
 
 namespace Micro\Plugin\Uuid;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Plugin\Uuid\Business\UuidExtractorFactory;
 use Micro\Plugin\Uuid\Business\UuidExtractorFactoryInterface;
@@ -14,7 +14,7 @@ use Micro\Plugin\Uuid\Business\UuidGeneratorFactoryInterface;
  */
 class UuidPlugin implements DependencyProviderInterface
 {
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(UuidFacadeInterface::class, function() {
             return $this->createUuidFacadeFactory()->create();

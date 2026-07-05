@@ -11,7 +11,7 @@
 
 namespace Micro\Plugin\Locator;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Plugin\Locator\Facade\LocatorFacade;
@@ -23,7 +23,7 @@ class LocatorPlugin implements DependencyProviderInterface
 {
     private ?KernelInterface $kernel = null;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(LocatorFacadeInterface::class, function (
             KernelInterface $kernel

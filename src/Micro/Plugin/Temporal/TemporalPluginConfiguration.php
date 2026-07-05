@@ -13,8 +13,7 @@ use Micro\Plugin\Temporal\Configuration\Worker\WorkflowWorkerConfigurationInterf
 
 class TemporalPluginConfiguration extends PluginConfiguration implements TemporalPluginConfigurationInterface
 {
-
-    const CFG_CLIENT_LIST = 'TEMPORAL_CLIENT_LIST';
+    const string CFG_CLIENT_LIST = 'TEMPORAL_CLIENT_LIST';
 
     /**
      * {@inheritDoc}

@@ -13,7 +13,7 @@ namespace Micro\Plugin\Amqp;
 
 use Micro\Framework\Autowire\AutowireHelperFactory;
 use Micro\Framework\Autowire\AutowireHelperFactoryInterface;
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
@@ -40,7 +40,7 @@ class AmqpPlugin implements DependencyProviderInterface, PluginDependedInterface
 
     private LocatorFacadeInterface $locatorFacade;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(
             AmqpFacadeInterface::class, function (

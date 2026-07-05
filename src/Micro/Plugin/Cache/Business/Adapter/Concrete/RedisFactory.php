@@ -13,8 +13,8 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Cache\Business\Adapter\Concrete;
 
-use Micro\Framework\DependencyInjection\Container;
 use Micro\Framework\DependencyInjection\Exception\ServiceNotRegisteredException;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Plugin\Cache\Business\Adapter\ConcreteAdapterFactoryInterface;
 use Micro\Plugin\Cache\Configuration\Adapter\CachePoolConfigurationInterface;
 use Micro\Plugin\Redis\Facade\RedisFacadeInterface;
@@ -24,7 +24,7 @@ use Symfony\Component\Cache\Exception\CacheException;
 
 readonly class RedisFactory implements ConcreteAdapterFactoryInterface
 {
-    public function __construct(private Container $container)
+    public function __construct(private MutableContainerInterface $container)
     {
     }
 

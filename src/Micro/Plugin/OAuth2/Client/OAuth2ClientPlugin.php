@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\OAuth2\Client;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
@@ -41,7 +41,7 @@ class OAuth2ClientPlugin implements DependencyProviderInterface, ConfigurableInt
     /**
      * {@inheritDoc}
      */
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(Oauth2ClientFacadeInterface::class, function (
             KernelInterface $kernel

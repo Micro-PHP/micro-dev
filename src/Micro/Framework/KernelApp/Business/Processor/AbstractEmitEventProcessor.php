@@ -11,11 +11,13 @@
 
 namespace Micro\Framework\KernelApp\Business\Processor;
 
-use Micro\Framework\DependencyInjection\Container;
 use Micro\Framework\EventEmitter\EventInterface;
 use Micro\Framework\KernelApp\AppKernelInterface;
 use Micro\Framework\KernelApp\Business\KernelActionProcessorInterface;
 use Micro\Plugin\EventEmitter\EventsFacadeInterface;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 
 abstract class AbstractEmitEventProcessor implements KernelActionProcessorInterface
 {
@@ -29,12 +31,12 @@ abstract class AbstractEmitEventProcessor implements KernelActionProcessorInterf
     abstract protected function createEvent(AppKernelInterface $appKernel): EventInterface;
 
     /**
-     * @throws \Psr\Container\ContainerExceptionInterface
-     * @throws \Psr\Container\NotFoundExceptionInterface
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      *
      * @psalm-suppress MoreSpecificReturnType
      */
-    protected function lookupEventEmitter(Container $container): EventsFacadeInterface
+    protected function lookupEventEmitter(ContainerInterface $container): EventsFacadeInterface
     {
         /**
          * @psalm-suppress LessSpecificReturnStatement

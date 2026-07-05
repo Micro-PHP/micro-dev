@@ -14,22 +14,15 @@ namespace Micro\Framework\BootDependency\Boot;
 use Micro\Framework\Autowire\AutowireHelperFactory;
 use Micro\Framework\Autowire\AutowireHelperInterface;
 use Micro\Framework\Autowire\ContainerAutowire;
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
-use Psr\Container\ContainerInterface;
 
 readonly class DependencyProviderBootLoader implements PluginBootLoaderInterface
 {
-    /**
-     * @var Container
-     */
-    private ContainerInterface $container;
+    private MutableContainerInterface $container;
 
-    /**
-     * @param Container $container
-     */
-    public function __construct(ContainerInterface $container)
+    public function __construct(MutableContainerInterface $container)
     {
         if (!($container instanceof ContainerAutowire)) {
             $container = new ContainerAutowire($container);
@@ -44,8 +37,6 @@ readonly class DependencyProviderBootLoader implements PluginBootLoaderInterface
     }
 
     /**
-     * @TODO: uncomment at 2.0 version
-     *
      * {@inheritDoc}
      */
     public function boot(object $plugin): void

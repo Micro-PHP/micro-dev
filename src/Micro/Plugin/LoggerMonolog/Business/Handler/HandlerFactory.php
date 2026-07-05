@@ -11,7 +11,7 @@
 
 namespace Micro\Plugin\LoggerMonolog\Business\Handler;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Plugin\Logger\Configuration\LoggerProviderTypeConfigurationInterface;
 use Micro\Plugin\LoggerMonolog\Configuration\Handler\HandlerConfigurationFactoryInterface;
 use Monolog\Handler\HandlerInterface;
@@ -19,7 +19,7 @@ use Monolog\Handler\HandlerInterface;
 readonly class HandlerFactory implements HandlerFactoryInterface
 {
     public function __construct(
-        private Container $container,
+        private MutableContainerInterface $container,
         private HandlerConfigurationFactoryInterface $handlerConfigurationFactory
     ) {
     }

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\LoggerMonolog\Tests\Unit\Business\Handler;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Plugin\Logger\Configuration\LoggerProviderTypeConfigurationInterface;
 use Micro\Plugin\LoggerMonolog\Business\Handler\HandlerFactory;
 use Micro\Plugin\LoggerMonolog\Configuration\Handler\HandlerConfigurationFactoryInterface;
@@ -22,7 +22,7 @@ use PHPUnit\Framework\TestCase;
 
 class HandlerFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
         $handlerConfig = $this->createMock(HandlerConfigurationInterface::class);
         $handlerConfig
@@ -30,7 +30,7 @@ class HandlerFactoryTest extends TestCase
             ->method('getHandlerClassName')
             ->willReturn(TestHandlerImpl::class);
 
-        $container = $this->createMock(Container::class);
+        $container = $this->createMock(MutableContainerInterface::class);
         $handlerConfigurationFactory = $this->createMock(HandlerConfigurationFactoryInterface::class);
         $handlerConfigurationFactory->expects($this->once())
             ->method('create')

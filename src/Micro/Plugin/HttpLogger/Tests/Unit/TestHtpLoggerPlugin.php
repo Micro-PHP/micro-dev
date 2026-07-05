@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpLogger\Tests\Unit;
 
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
 use Micro\Framework\BootPluginDependent\Plugin\PluginDependedInterface;
@@ -27,7 +27,7 @@ class TestHtpLoggerPlugin implements DependencyProviderInterface, PluginDepended
 {
     use PluginConfigurationTrait;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
     }
 

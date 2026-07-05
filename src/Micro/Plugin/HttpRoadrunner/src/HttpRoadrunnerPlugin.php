@@ -17,7 +17,7 @@ use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootPluginDependent\Plugin\PluginDependedInterface;
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Plugin\EventEmitter\EventEmitterPlugin;
 use Micro\Plugin\HttpCore\HttpCorePlugin;
 use Micro\Plugin\HttpRoadrunner\Facade\HttpRoadrunnerFacade;
@@ -30,7 +30,7 @@ final class HttpRoadrunnerPlugin implements DependencyProviderInterface, PluginD
 {
     use PluginConfigurationTrait;
 
-    public function provideDependencies(Container $container): void
+    public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(HttpRoadrunnerFacadeInterface::class, function () {
             return new HttpRoadrunnerFacade($this->configuration());
