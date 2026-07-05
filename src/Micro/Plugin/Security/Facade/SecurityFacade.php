@@ -16,7 +16,7 @@ readonly class SecurityFacade implements SecurityFacadeInterface
     /**
      * {@inheritDoc}
      */
-    public function generateToken(array $parameters, string $providerName = null): TokenInterface
+    public function generateToken(array $parameters, ?string $providerName = null): TokenInterface
     {
         if(!$providerName) {
             $providerName = SecurityPluginConfigurationInterface::PROVIDER_DEFAULT;
@@ -30,7 +30,7 @@ readonly class SecurityFacade implements SecurityFacadeInterface
     /**
      * {@inheritDoc}
      */
-    public function decodeToken(string $encoded, string $providerName = null): TokenInterface
+    public function decodeToken(string $encoded, ?string $providerName = null): TokenInterface
     {
         if(!$providerName) {
             $providerName = SecurityPluginConfigurationInterface::PROVIDER_DEFAULT;

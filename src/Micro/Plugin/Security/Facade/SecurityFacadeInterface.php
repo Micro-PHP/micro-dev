@@ -13,7 +13,7 @@ interface SecurityFacadeInterface
      *
      * @return TokenInterface
      */
-    public function generateToken(array $parameters, string $providerName = null): TokenInterface;
+    public function generateToken(array $parameters, ?string $providerName = null): TokenInterface;
 
     /**
      * @param string $encoded
@@ -23,5 +23,5 @@ interface SecurityFacadeInterface
      *
      * @throws ExpiredException
      */
-    public function decodeToken(string $encoded, string $providerName = null): TokenInterface;
+    public function decodeToken(string $encoded, ?string $providerName = null): TokenInterface;
 }
