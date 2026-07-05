@@ -12,7 +12,7 @@
 namespace Micro\Plugin\HttpRouterCode\Tests\Unit;
 
 use Micro\Framework\DependencyInjection\Container;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Plugin\HttpCore\Business\Locator\RouteLocatorInterface;
 use Micro\Plugin\HttpCore\Facade\HttpFacadeInterface;
@@ -34,34 +34,34 @@ class HttpRouterCodePluginTest extends TestCase
         $this->plugin->provideDependencies($this->container);
     }
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(HttpRouteLocatorPluginInterface::class, $this->plugin);
     }
 
-    public function testGetLocatorType()
+    public function testGetLocatorType(): void
     {
         $this->assertEquals('code', $this->plugin->getLocatorType());
     }
 
-    public function testCreateLocator()
+    public function testCreateLocator(): void
     {
         $this->container
             ->method('get')
             ->willReturn(
-                $this->createMock(KernelInterface::class),
+                $this->createMock(PluginCollectionInterface::class),
                 $this->createMock(HttpFacadeInterface::class)
             );
 
         $this->assertInstanceOf(RouteLocatorInterface::class, $this->plugin->createLocator());
     }
 
-    public function testProvideDependencies()
+    public function testProvideDependencies(): void
     {
         $this->assertInstanceOf(DependencyProviderInterface::class, $this->plugin);
     }
 
-    public function testGetDependedPlugins()
+    public function testGetDependedPlugins(): void
     {
         $this->assertEquals(
             [HttpCorePlugin::class],

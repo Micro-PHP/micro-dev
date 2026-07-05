@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Doctrine\Business\Locator;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 
 /**
  * @author Stanislau Komar <head.trackingsoft@gmail.com>
  */
 readonly class EntityFileConfigurationLocatorFactory implements EntityFileConfigurationLocatorFactoryInterface
 {
-    public function __construct(private KernelInterface $kernel)
+    public function __construct(private PluginCollectionInterface $pluginCollection)
     {
     }
 
     public function create(): EntityFileConfigurationLocatorInterface
     {
-        return new AttributeEntityFileConfigurationLocator($this->kernel);
+        return new AttributeEntityFileConfigurationLocator($this->pluginCollection);
     }
 }

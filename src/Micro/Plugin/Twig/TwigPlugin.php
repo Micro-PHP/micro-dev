@@ -12,7 +12,7 @@
 namespace Micro\Plugin\Twig;
 
 use Micro\Framework\DependencyInjection\MutableContainerInterface;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
@@ -33,14 +33,14 @@ class TwigPlugin implements DependencyProviderInterface, ConfigurableInterface
 {
     use PluginConfigurationTrait;
 
-    private KernelInterface $kernel;
+    private PluginCollectionInterface $pluginCollection;
 
     public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(TwigFacadeInterface::class, function (
-            KernelInterface $kernel
+            PluginCollectionInterface $pluginCollection
         ) {
-            $this->kernel = $kernel;
+            $this->pluginCollection = $pluginCollection;
 
             return $this->createTwigFacade();
         });
@@ -70,7 +70,7 @@ class TwigPlugin implements DependencyProviderInterface, ConfigurableInterface
 
     protected function createLoaderProcessor(): LoaderProcessorInterface
     {
-        return new LoaderProcessor($this->kernel, $this->createLoaders());
+        return new LoaderProcessor($this->pluginCollection, $this->createLoaders());
     }
 
     /**

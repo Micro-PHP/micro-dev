@@ -13,23 +13,24 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Logger\Tests\Unit;
 
-use Micro\Component\DependencyInjection\Autowire\ContainerAutowire;
+use Micro\Framework\Autowire\ContainerAutowire;
 use Micro\Framework\DependencyInjection\Container;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\Logger\Facade\LoggerFacadeInterface;
 use Micro\Plugin\Logger\LoggerPlugin;
 use Micro\Plugin\Logger\LoggerPluginConfiguration;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @author GTPChat
  */
-class LoggerPluginTest extends \PHPUnit\Framework\TestCase
+class LoggerPluginTest extends TestCase
 {
-    public function testProvideDependencies()
+    public function testProvideDependencies(): void
     {
-        $kernelMock = $this->createMock(KernelInterface::class);
+        $kernelMock = $this->createMock(PluginCollectionInterface::class);
         $container = new ContainerAutowire(new Container());
-        $container->register(KernelInterface::class, fn () => $kernelMock);
+        $container->register(PluginCollectionInterface::class, fn () => $kernelMock);
 
         $configMock = $this->createMock(LoggerPluginConfiguration::class);
 

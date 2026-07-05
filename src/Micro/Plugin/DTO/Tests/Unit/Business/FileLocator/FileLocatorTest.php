@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Micro\Plugin\DTO\Tests\Unit\Business\FileLocator;
 
 use Micro\Framework\BootConfiguration\Configuration\DefaultApplicationConfiguration;
-use Micro\Framework\KernelApp\AppKernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\DTO\Business\FileLocator\FileLocator;
 use Micro\Plugin\DTO\DTOPluginConfiguration;
 use Micro\Plugin\DTO\Tests\Unit\TestPlugin;
@@ -22,9 +22,9 @@ use PHPUnit\Framework\TestCase;
 
 class FileLocatorTest extends TestCase
 {
-    public function testLookup()
+    public function testLookup(): void
     {
-        $appKernel = $this->createMock(AppKernelInterface::class);
+        $appKernel = $this->createMock(PluginCollectionInterface::class);
         $appKernel->method('plugins')->willReturn(new \ArrayObject([
             new TestPlugin(),
         ]));

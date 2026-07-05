@@ -11,7 +11,7 @@
 
 namespace Micro\Plugin\Logger\Business\Provider;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\Logger\Configuration\LoggerPluginConfigurationInterface;
 use Micro\Plugin\Logger\Configuration\LoggerProviderTypeConfigurationInterface;
 use Micro\Plugin\Logger\Exception\LoggerAdapterAlreadyExistsException;
@@ -32,7 +32,7 @@ class LoggerProvider implements LoggerProviderInterface
     private array $loggerAdapters;
 
     public function __construct(
-        private readonly KernelInterface $kernel,
+        private readonly PluginCollectionInterface $pluginCollection,
         private readonly LoggerPluginConfigurationInterface $loggerPluginConfiguration
     ) {
         $this->loggerCollection = [];
@@ -92,7 +92,7 @@ class LoggerProvider implements LoggerProviderInterface
             return;
         }
 
-        $iterator = $this->kernel->plugins(LoggerProviderPluginInterface::class);
+        $iterator = $this->pluginCollection->plugins(LoggerProviderPluginInterface::class);
         $installed = false;
         /** @var LoggerProviderPluginInterface $adapter */
         foreach ($iterator as $adapter) {

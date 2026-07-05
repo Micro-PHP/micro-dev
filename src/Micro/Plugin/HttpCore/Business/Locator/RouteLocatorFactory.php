@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpCore\Business\Locator;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\HttpCore\Configuration\HttpCorePluginConfigurationInterface;
 use Micro\Plugin\HttpCore\Plugin\HttpRouteLocatorPluginInterface;
 
@@ -23,7 +23,7 @@ use Micro\Plugin\HttpCore\Plugin\HttpRouteLocatorPluginInterface;
 readonly class RouteLocatorFactory implements RouteLocatorFactoryInterface
 {
     public function __construct(
-        private KernelInterface $kernel,
+        private PluginCollectionInterface $pluginCollection,
         private HttpCorePluginConfigurationInterface $configuration
     ) {
     }
@@ -36,7 +36,7 @@ readonly class RouteLocatorFactory implements RouteLocatorFactoryInterface
         $providerType = mb_strtolower($this->configuration->getRouteLocatorType());
 
         /** @var HttpRouteLocatorPluginInterface $provider */
-        foreach ($this->kernel->plugins(HttpRouteLocatorPluginInterface::class) as $provider) {
+        foreach ($this->pluginCollection->plugins(HttpRouteLocatorPluginInterface::class) as $provider) {
             if ($providerType !== mb_strtolower($provider->getLocatorType())) {
                 continue;
             }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Serializer\Tests\Unit\Business\Pool;
 
-use Micro\Framework\Kernel\Kernel;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\Serializer\Business\Context\SerializerContextInterface;
 use Micro\Plugin\Serializer\Business\Pool\SerializerPool;
 use Micro\Plugin\Serializer\Exception\SerializerNotFoundException;
@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 class SerializerPoolTest extends TestCase
 {
-    private MockObject&Kernel $kernelMock;
+    private MockObject&PluginCollectionInterface $pluginCollection;
 
     private MockObject&SerializerAdapterPluginInterface $serializerProviderPluginMock;
 
@@ -25,9 +25,7 @@ class SerializerPoolTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->kernelMock = $this->getMockBuilder(Kernel::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->pluginCollection = $this->createMock(PluginCollectionInterface::class);
 
         $this->serializerProviderPluginMock = $this->getMockBuilder(SerializerAdapterPluginInterface::class)
             ->disableOriginalConstructor()
@@ -44,9 +42,9 @@ class SerializerPoolTest extends TestCase
 
     public function testSerialize(): void
     {
-        $serializerPool = new SerializerPool($this->kernelMock);
+        $serializerPool = new SerializerPool($this->pluginCollection);
 
-        $this->kernelMock->expects($this->once())
+        $this->pluginCollection->expects($this->once())
             ->method('plugins')
             ->with(SerializerAdapterPluginInterface::class)
             ->willReturn(new \ArrayObject([$this->serializerProviderPluginMock]));
@@ -60,10 +58,15 @@ class SerializerPoolTest extends TestCase
             ->with($this->serializerContextMock)
             ->willReturn(true);
 
+        $serializedData = ['data', 'another data'];
         $this->serializerMock->expects($this->exactly(2))
             ->method('serialize')
-            ->withConsecutive(['data', $this->serializerContextMock], ['another data', $this->serializerContextMock])
-            ->willReturn('serialized data');
+            ->willReturnCallback(function (mixed $data, SerializerContextInterface $context) use (&$serializedData): string {
+                self::assertSame(array_shift($serializedData), $data);
+                self::assertSame($this->serializerContextMock, $context);
+
+                return 'serialized data';
+            });
 
         $serializerPool->serialize('data', $this->serializerContextMock);
         $serializerPool->serialize('another data', $this->serializerContextMock);
@@ -71,9 +74,9 @@ class SerializerPoolTest extends TestCase
 
     public function testDeserialize(): void
     {
-        $serializerPool = new SerializerPool($this->kernelMock);
+        $serializerPool = new SerializerPool($this->pluginCollection);
 
-        $this->kernelMock->expects($this->once())
+        $this->pluginCollection->expects($this->once())
             ->method('plugins')
             ->with(SerializerAdapterPluginInterface::class)
             ->willReturn(new \ArrayObject([$this->serializerProviderPluginMock]));
@@ -87,10 +90,15 @@ class SerializerPoolTest extends TestCase
             ->with($this->serializerContextMock)
             ->willReturn(true);
 
+        $serializedData = ['data', 'another data'];
         $this->serializerMock->expects($this->exactly(2))
             ->method('deserialize')
-            ->withConsecutive(['data', $this->serializerContextMock], ['another data', $this->serializerContextMock])
-            ->willReturn('deserialized data');
+            ->willReturnCallback(function (mixed $data, SerializerContextInterface $context) use (&$serializedData): string {
+                self::assertSame(array_shift($serializedData), $data);
+                self::assertSame($this->serializerContextMock, $context);
+
+                return 'deserialized data';
+            });
 
         $serializerPool->deserialize('data', $this->serializerContextMock);
         $serializerPool->deserialize('another data', $this->serializerContextMock);
@@ -98,9 +106,9 @@ class SerializerPoolTest extends TestCase
 
     public function testSerializerNotFoundSerialize(): void
     {
-        $serializerPool = new SerializerPool($this->kernelMock);
+        $serializerPool = new SerializerPool($this->pluginCollection);
 
-        $this->kernelMock->expects($this->once())
+        $this->pluginCollection->expects($this->once())
             ->method('plugins')
             ->with(SerializerAdapterPluginInterface::class)
             ->willReturn(new \ArrayObject([$this->serializerProviderPluginMock]));
@@ -124,9 +132,9 @@ class SerializerPoolTest extends TestCase
 
     public function testSerializerNotFoundDeserialize(): void
     {
-        $serializerPool = new SerializerPool($this->kernelMock);
+        $serializerPool = new SerializerPool($this->pluginCollection);
 
-        $this->kernelMock->expects($this->once())
+        $this->pluginCollection->expects($this->once())
             ->method('plugins')
             ->with(SerializerAdapterPluginInterface::class)
             ->willReturn(new \ArrayObject([$this->serializerProviderPluginMock]));

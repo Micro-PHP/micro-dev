@@ -16,6 +16,7 @@ namespace Micro\Plugin\HttpCore;
 use Micro\Framework\Autowire\AutowireHelperFactory;
 use Micro\Framework\Autowire\AutowireHelperFactoryInterface;
 use Micro\Framework\DependencyInjection\MutableContainerInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
@@ -53,6 +54,8 @@ class HttpCorePlugin implements DependencyProviderInterface, ConfigurableInterfa
 {
     use PluginConfigurationTrait;
 
+    private PluginCollectionInterface $pluginCollection;
+
     private KernelInterface $kernel;
 
     private MutableContainerInterface $container;
@@ -62,8 +65,10 @@ class HttpCorePlugin implements DependencyProviderInterface, ConfigurableInterfa
         $this->container = $container;
 
         $container->register(HttpFacadeInterface::class, function (
+            PluginCollectionInterface $pluginCollection,
             KernelInterface $kernel
         ) {
+            $this->pluginCollection = $pluginCollection;
             $this->kernel = $kernel;
 
             return $this->createFacade();
@@ -127,7 +132,7 @@ class HttpCorePlugin implements DependencyProviderInterface, ConfigurableInterfa
     protected function createRouteLocatorFactory(): RouteLocatorFactoryInterface
     {
         return new RouteLocatorFactory(
-            $this->kernel,
+            $this->pluginCollection,
             $this->configuration()
         );
     }
@@ -158,7 +163,7 @@ class HttpCorePlugin implements DependencyProviderInterface, ConfigurableInterfa
     protected function createResponseTransformerFactory(): ResponseTransformerFactoryInterface
     {
         return new ResponseTransformerFactory(
-            $this->kernel
+            $this->pluginCollection
         );
     }
 

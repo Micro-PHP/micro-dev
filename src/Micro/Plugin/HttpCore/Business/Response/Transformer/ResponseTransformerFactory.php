@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpCore\Business\Response\Transformer;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\HttpCore\Plugin\HttpResponseTransformerPlugin;
 
 /**
@@ -22,14 +22,14 @@ use Micro\Plugin\HttpCore\Plugin\HttpResponseTransformerPlugin;
 readonly class ResponseTransformerFactory implements ResponseTransformerFactoryInterface
 {
     public function __construct(
-        private KernelInterface $kernel
+        private PluginCollectionInterface $pluginCollection
     ) {
     }
 
     public function create(): ResponseTransformerInterface
     {
         $transformers = [];
-        $iterator = $this->kernel->plugins(HttpResponseTransformerPlugin::class);
+        $iterator = $this->pluginCollection->plugins(HttpResponseTransformerPlugin::class);
         /** @var HttpResponseTransformerPlugin $plugin */
         foreach ($iterator as $plugin) {
             $transformers[$plugin->weight()] = $plugin->createTransformer();

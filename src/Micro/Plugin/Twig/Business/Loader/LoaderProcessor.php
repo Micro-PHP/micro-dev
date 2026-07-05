@@ -11,7 +11,7 @@
 
 namespace Micro\Plugin\Twig\Business\Loader;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Twig\Environment;
 use Twig\Error\Error;
 use Twig\Error\LoaderError;
@@ -22,7 +22,7 @@ readonly class LoaderProcessor implements LoaderProcessorInterface
      * @param LoaderInterface[] $loaders
      */
     public function __construct(
-        private KernelInterface $appKernel,
+        private PluginCollectionInterface $pluginCollection,
         private iterable $loaders
     ) {
     }
@@ -32,7 +32,7 @@ readonly class LoaderProcessor implements LoaderProcessorInterface
      */
     public function load(Environment $environment): void
     {
-        foreach ($this->appKernel->plugins() as $plugin) {
+        foreach ($this->pluginCollection->plugins() as $plugin) {
             $this->process($environment, $plugin);
         }
     }

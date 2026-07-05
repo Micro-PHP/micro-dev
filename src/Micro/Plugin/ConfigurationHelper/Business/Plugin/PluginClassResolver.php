@@ -12,12 +12,12 @@
 namespace Micro\Plugin\ConfigurationHelper\Business\Plugin;
 
 use Micro\Framework\BootConfiguration\Configuration\Exception\InvalidConfigurationException;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 
 readonly class PluginClassResolver implements PluginClassResolverInterface
 {
     public function __construct(
-        private KernelInterface $kernel
+        private PluginCollectionInterface $pluginCollection
     ) {
     }
 
@@ -26,7 +26,7 @@ readonly class PluginClassResolver implements PluginClassResolverInterface
      */
     public function resolve(string $pluginAlias): object
     {
-        foreach ($this->kernel->plugins() as $plugin) {
+        foreach ($this->pluginCollection->plugins() as $plugin) {
             if ($this->getPluginName($plugin) === $pluginAlias) {
                 return $plugin;
             }

@@ -13,12 +13,12 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Doctrine\Business\Locator;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 
 readonly class AttributeEntityFileConfigurationLocator implements EntityFileConfigurationLocatorInterface
 {
     public function __construct(
-        private KernelInterface $kernel
+        private PluginCollectionInterface $pluginCollection
     ) {
     }
 
@@ -26,7 +26,7 @@ readonly class AttributeEntityFileConfigurationLocator implements EntityFileConf
     {
         $files = [];
 
-        foreach ($this->kernel->plugins() as $plugin) {
+        foreach ($this->pluginCollection->plugins() as $plugin) {
             $pluginFiles = $this->getPluginFiles($plugin);
             if (!$pluginFiles) {
                 continue;

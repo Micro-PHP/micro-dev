@@ -12,9 +12,8 @@
 namespace Micro\Plugin\ConfigurationHelper;
 
 use Micro\Framework\DependencyInjection\MutableContainerInterface;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
-use Micro\Framework\KernelApp\AppKernelInterface;
 use Micro\Plugin\ConfigurationHelper\Business\Path\PathResolverFactory;
 use Micro\Plugin\ConfigurationHelper\Business\Path\PathResolverFactoryInterface;
 use Micro\Plugin\ConfigurationHelper\Business\Plugin\PluginClassResolverFactory;
@@ -27,23 +26,23 @@ class ConfigurationHelperPlugin implements DependencyProviderInterface
 {
     public function provideDependencies(MutableContainerInterface $container): void
     {
-        $container->register(ConfigurationHelperFacadeInterface::class, function (AppKernelInterface $kernel) {
-            return $this->createFacade($kernel);
+        $container->register(ConfigurationHelperFacadeInterface::class, function (PluginCollectionInterface $pluginCollection) {
+            return $this->createFacade($pluginCollection);
         });
     }
 
-    protected function createFacade(KernelInterface $kernel): ConfigurationHelperFacadeInterface
+    protected function createFacade(PluginCollectionInterface $pluginCollection): ConfigurationHelperFacadeInterface
     {
-        $classResolverFactory = $this->createPluginClassResolverFactory($kernel);
+        $classResolverFactory = $this->createPluginClassResolverFactory($pluginCollection);
         $classResolver = $classResolverFactory->create();
         $pathResolver = $this->createPathResolverFactoryInterface($classResolver)->create();
 
         return new ConfigurationHelperFacade($pathResolver);
     }
 
-    protected function createPluginClassResolverFactory(KernelInterface $kernel): PluginClassResolverFactoryInterface
+    protected function createPluginClassResolverFactory(PluginCollectionInterface $pluginCollection): PluginClassResolverFactoryInterface
     {
-        return new PluginClassResolverFactory($kernel);
+        return new PluginClassResolverFactory($pluginCollection);
     }
 
     protected function createPathResolverFactoryInterface(PluginClassResolverInterface $pluginClassResolver): PathResolverFactoryInterface

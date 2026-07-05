@@ -11,7 +11,7 @@
 
 namespace Micro\Plugin\HttpRouterCode\Tests\Unit\Business\Locator;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\HttpCore\Business\Route\RouteInterface;
 use Micro\Plugin\HttpCore\Facade\HttpFacadeInterface;
 use Micro\Plugin\HttpRouterCode\Business\Locator\RouteCodeLocator;
@@ -20,9 +20,9 @@ use PHPUnit\Framework\TestCase;
 
 class RouteCodeLocatorTest extends TestCase
 {
-    public function testLocate()
+    public function testLocate(): void
     {
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = $this->createMock(PluginCollectionInterface::class);
         $httpFacadeMock = $this->createMock(HttpFacadeInterface::class);
         $kernel
             ->expects($this->once())

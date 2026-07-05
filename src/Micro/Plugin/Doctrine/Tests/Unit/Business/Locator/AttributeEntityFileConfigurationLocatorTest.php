@@ -13,15 +13,15 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Doctrine\Tests\Unit\Business\Locator;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\Doctrine\Business\Locator\AttributeEntityFileConfigurationLocator;
 use PHPUnit\Framework\TestCase;
 
 class AttributeEntityFileConfigurationLocatorTest extends TestCase
 {
-    public function testGetEnabledPluginDirs()
+    public function testGetEnabledPluginDirs(): void
     {
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = $this->createMock(PluginCollectionInterface::class);
         $kernel->expects($this->once())
             ->method('plugins')
             ->willReturn(new \ArrayObject([

@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Logger\Tests\Unit\Business\Provider;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\Logger\Business\Factory\LoggerFactoryInterface;
 use Micro\Plugin\Logger\Business\Provider\LoggerProvider;
 use Micro\Plugin\Logger\Configuration\LoggerPluginConfigurationInterface;
@@ -29,7 +29,7 @@ class LoggerProviderTest extends TestCase
 {
     private LoggerProvider $loggerProvider;
 
-    private KernelInterface $kernel;
+    private PluginCollectionInterface $kernel;
 
     private LoggerPluginConfigurationInterface $loggerPluginConfiguration;
 
@@ -41,7 +41,7 @@ class LoggerProviderTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->kernel = $this->createMock(KernelInterface::class);
+        $this->kernel = $this->createMock(PluginCollectionInterface::class);
         $this->loggerPluginConfiguration = $this->createMock(LoggerPluginConfigurationInterface::class);
         $this->loggerFactory = $this->createMock(LoggerFactoryInterface::class);
         $this->loggerProviderPlugin = $this->createMock(LoggerProviderPluginInterface::class);
@@ -50,7 +50,7 @@ class LoggerProviderTest extends TestCase
         $this->loggerProvider = new LoggerProvider($this->kernel, $this->loggerPluginConfiguration);
     }
 
-    public function testGetLoggerWhenOnlyOneproviderRegistered(): void
+    public function testGetLoggerWhenOnlyOneProviderRegistered(): void
     {
         $loggerProviderTypeConfig = $this->createMock(LoggerProviderTypeConfigurationInterface::class);
 
@@ -149,7 +149,7 @@ class LoggerProviderTest extends TestCase
         $this->assertSame($this->logger, $this->loggerProvider->getLogger('loggerName'));
     }
 
-    public function dataProviderGetLoggerWhenManyOneProviderRegistered()
+    public static function dataProviderGetLoggerWhenManyOneProviderRegistered()
     {
         return [
             [true],

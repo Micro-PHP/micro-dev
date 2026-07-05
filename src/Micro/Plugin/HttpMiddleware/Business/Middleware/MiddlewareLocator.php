@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpMiddleware\Business\Middleware;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\HttpMiddleware\Plugin\HttpMiddlewareOrderedPluginInterface;
 use Micro\Plugin\HttpMiddleware\Plugin\HttpMiddlewarePluginInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -24,14 +24,14 @@ use Symfony\Component\HttpFoundation\Request;
 readonly class MiddlewareLocator implements MiddlewareLocatorInterface
 {
     public function __construct(
-        private KernelInterface $kernel
+        private PluginCollectionInterface $pluginCollection
     ) {
     }
 
     public function locate(Request $request): \Traversable
     {
         /** @var \Generator<HttpMiddlewarePluginInterface> $it */
-        $it = $this->kernel->plugins(HttpMiddlewarePluginInterface::class);
+        $it = $this->pluginCollection->plugins(HttpMiddlewarePluginInterface::class);
         $requestPath = $request->getPathInfo();
 
         /** @var array<int, HttpMiddlewarePluginInterface[]> $pc */
@@ -41,7 +41,7 @@ readonly class MiddlewareLocator implements MiddlewareLocatorInterface
         /** @var HttpMiddlewarePluginInterface $middleware */
         foreach ($it as $middleware) {
             $methods = array_map('strtolower', $middleware->getRequestMatchMethods());
-            if (!\in_array($requestMethod, $methods)) {
+            if (!\in_array($requestMethod, $methods, true)) {
                 continue;
             }
 

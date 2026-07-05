@@ -13,10 +13,10 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Twig\Tests\Unit;
 
-use Micro\Component\DependencyInjection\Autowire\ContainerAutowire;
+use Micro\Framework\Autowire\ContainerAutowire;
 use Micro\Framework\DependencyInjection\Container;
 use Micro\Framework\BootConfiguration\Configuration\ApplicationConfigurationInterface;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\Twig\TwigFacadeInterface;
 use Micro\Plugin\Twig\TwigPlugin;
 use Micro\Plugin\Twig\TwigPluginConfiguration;
@@ -39,11 +39,11 @@ class TwigPluginTest extends TestCase
         $this->plugin->setConfiguration($this->pluginConfiguration);
     }
 
-    public function testProvideDependencies()
+    public function testProvideDependencies(): void
     {
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = $this->createMock(PluginCollectionInterface::class);
         $container = new ContainerAutowire(new Container());
-        $container->register(KernelInterface::class, fn () => $kernel);
+        $container->register(PluginCollectionInterface::class, fn () => $kernel);
         $this->plugin->provideDependencies($container);
         $this->assertInstanceOf(TwigFacadeInterface::class, $container->get(TwigFacadeInterface::class));
     }

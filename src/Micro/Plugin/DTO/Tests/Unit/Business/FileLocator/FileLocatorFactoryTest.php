@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\DTO\Tests\Unit\Business\FileLocator;
 
-use Micro\Framework\KernelApp\AppKernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\DTO\Business\FileLocator\FileLocatorFactory;
 use Micro\Plugin\DTO\DTOPluginConfigurationInterface;
 use PHPUnit\Framework\TestCase;
 
 class FileLocatorFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
-        $appKernel = $this->createMock(AppKernelInterface::class);
+        $appKernel = $this->createMock(PluginCollectionInterface::class);
         $cfg = $this->createMock(DTOPluginConfigurationInterface::class);
 
         $factory = new FileLocatorFactory(

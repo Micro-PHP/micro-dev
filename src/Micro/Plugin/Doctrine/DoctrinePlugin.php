@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Micro\Plugin\Doctrine;
 
 use Micro\Framework\DependencyInjection\MutableContainerInterface;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
@@ -43,12 +43,12 @@ class DoctrinePlugin implements DependencyProviderInterface, ConfigurableInterfa
 {
     use PluginConfigurationTrait;
 
-    private KernelInterface $kernel;
+    private PluginCollectionInterface $pluginCollection;
 
     public function provideDependencies(MutableContainerInterface $container): void
     {
-        $container->register(DoctrineFacadeInterface::class, function (KernelInterface $kernel): DoctrineFacadeInterface {
-            $this->kernel = $kernel;
+        $container->register(DoctrineFacadeInterface::class, function (PluginCollectionInterface $pluginCollection): DoctrineFacadeInterface {
+            $this->pluginCollection = $pluginCollection;
 
             return $this->createDoctrineFacade();
         });
@@ -91,6 +91,6 @@ class DoctrinePlugin implements DependencyProviderInterface, ConfigurableInterfa
 
     protected function createEntityFileConfigurationLocatorFactory(): EntityFileConfigurationLocatorFactoryInterface
     {
-        return new EntityFileConfigurationLocatorFactory($this->kernel);
+        return new EntityFileConfigurationLocatorFactory($this->pluginCollection);
     }
 }

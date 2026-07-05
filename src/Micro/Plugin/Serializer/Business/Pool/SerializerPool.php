@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Serializer\Business\Pool;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\Serializer\Business\Context\SerializerContextInterface;
 use Micro\Plugin\Serializer\Business\Serializer\SerializerInterface;
 use Micro\Plugin\Serializer\Exception\SerializerNotFoundException;
@@ -18,7 +18,7 @@ class SerializerPool implements SerializerInterface
      */
     private array $serializerPoolByContext = [];
 
-    public function __construct(private readonly KernelInterface $kernel)
+    public function __construct(private readonly PluginCollectionInterface $pluginCollection)
     {
     }
 
@@ -73,7 +73,7 @@ class SerializerPool implements SerializerInterface
      */
     protected function getSerializers(): iterable
     {
-        $iterator = $this->kernel->plugins(SerializerAdapterPluginInterface::class);
+        $iterator = $this->pluginCollection->plugins(SerializerAdapterPluginInterface::class);
 
         /** @var SerializerAdapterPluginInterface $serializerProviderPlugin */
         foreach ($iterator as $serializerProviderPlugin) {

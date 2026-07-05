@@ -13,16 +13,16 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpMiddleware\Tests\Unit\Business\Middleware;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\HttpMiddleware\Business\Middleware\MiddlewareLocatorFactory;
 use Micro\Plugin\HttpMiddleware\Business\Middleware\MiddlewareLocatorInterface;
 use PHPUnit\Framework\TestCase;
 
 class MiddlewareLocatorFactoryTest extends TestCase
 {
-    public function testCreate()
+    public function testCreate(): void
     {
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = $this->createMock(PluginCollectionInterface::class);
         $factory = new MiddlewareLocatorFactory($kernel);
         $this->assertInstanceOf(MiddlewareLocatorInterface::class, $factory->create());
     }

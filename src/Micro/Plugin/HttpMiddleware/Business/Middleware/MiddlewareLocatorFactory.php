@@ -13,19 +13,19 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpMiddleware\Business\Middleware;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 
 /**
  * @author Stanislau Komar <head.trackingsoft@gmail.com>
  */
 readonly class MiddlewareLocatorFactory implements MiddlewareLocatorFactoryInterface
 {
-    public function __construct(private KernelInterface $kernel)
+    public function __construct(private PluginCollectionInterface $pluginCollection)
     {
     }
 
     public function create(): MiddlewareLocatorInterface
     {
-        return new MiddlewareLocator($this->kernel);
+        return new MiddlewareLocator($this->pluginCollection);
     }
 }

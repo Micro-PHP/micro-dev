@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\Twig\Tests\Unit\Business\Loader;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\Twig\Business\Loader\LoaderInterface;
 use Micro\Plugin\Twig\Business\Loader\LoaderProcessor;
 use Micro\Plugin\Twig\Plugin\TwigTemplatePluginInterface;
@@ -23,9 +23,9 @@ use Twig\Extension\ExtensionInterface;
 
 class LoaderProcessorTest extends TestCase
 {
-    public function testLoad()
+    public function testLoad(): void
     {
-        $kernel = $this->createMock(KernelInterface::class);
+        $kernel = $this->createMock(PluginCollectionInterface::class);
         $kernel
             ->expects($this->once())
             ->method('plugins')

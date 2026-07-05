@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\OAuth2\Client\Provider\Locator;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\OAuth2\Client\Exception\ProviderAdapterNotRegisteredException;
 use Micro\Plugin\OAuth2\Client\Provider\OAuth2ClientProviderPluginInterface;
 
@@ -23,10 +23,10 @@ use Micro\Plugin\OAuth2\Client\Provider\OAuth2ClientProviderPluginInterface;
 readonly class ProviderPluginLocator implements ProviderPluginLocatorInterface
 {
     /**
-     * @param KernelInterface $kernel
+     * @param PluginCollectionInterface $pluginCollection
      */
     public function __construct(
-        private KernelInterface $kernel
+        private PluginCollectionInterface $pluginCollection
     ) {
     }
 
@@ -39,7 +39,7 @@ readonly class ProviderPluginLocator implements ProviderPluginLocatorInterface
 
         /** @var iterable<OAuth2ClientProviderPluginInterface> $iterator */
         $iterator = $this
-            ->kernel
+            ->pluginCollection
             ->plugins(OAuth2ClientProviderPluginInterface::class);
 
         foreach ($iterator as $providerPlugin) {

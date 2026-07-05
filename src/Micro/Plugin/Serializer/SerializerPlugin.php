@@ -3,7 +3,7 @@
 namespace Micro\Plugin\Serializer;
 
 use Micro\Framework\DependencyInjection\MutableContainerInterface;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Plugin\Serializer\Business\Pool\SerializerPool;
 use Micro\Plugin\Serializer\Business\Serializer\SerializerInterface;
@@ -15,21 +15,21 @@ class SerializerPlugin implements DependencyProviderInterface
     public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(SerializerFacadeInterface::class, function (
-            KernelInterface $kernel
+            PluginCollectionInterface $pluginCollection
         ) {
-            return $this->createSerializerFacade($kernel);
+            return $this->createSerializerFacade($pluginCollection);
         });
     }
 
-    protected function createSerializerFacade(KernelInterface $kernel): SerializerFacadeInterface
+    protected function createSerializerFacade(PluginCollectionInterface $pluginCollection): SerializerFacadeInterface
     {
         return new SerializerFacade(
-            $this->createSerializerPool($kernel)
+            $this->createSerializerPool($pluginCollection)
         );
     }
 
-    protected function createSerializerPool(KernelInterface $kernel): SerializerInterface
+    protected function createSerializerPool(PluginCollectionInterface $pluginCollection): SerializerInterface
     {
-        return new SerializerPool($kernel);
+        return new SerializerPool($pluginCollection);
     }
 }

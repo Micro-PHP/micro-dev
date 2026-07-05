@@ -18,7 +18,7 @@ use Micro\Framework\BootConfiguration\Plugin\ConfigurableInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootConfiguration\Plugin\PluginConfigurationTrait;
 use Micro\Framework\BootPluginDependent\Plugin\PluginDependedInterface;
-use Micro\Framework\KernelApp\AppKernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Library\DTO\SerializerFacadeDefault;
 use Micro\Library\DTO\SerializerFacadeInterface;
 use Micro\Library\DTO\ValidatorFacadeDefault;
@@ -39,17 +39,17 @@ class DTOPlugin implements DependencyProviderInterface, ConfigurableInterface, P
 {
     use PluginConfigurationTrait;
 
-    private AppKernelInterface $kernel;
+    private PluginCollectionInterface $pluginCollection;
 
     private LoggerFacadeInterface $loggerFacade;
 
     public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(DTOFacadeInterface::class, function (
-            AppKernelInterface $kernel,
+            PluginCollectionInterface $pluginCollection,
             LoggerFacadeInterface $loggerFacade
         ) {
-            $this->kernel = $kernel;
+            $this->pluginCollection = $pluginCollection;
             $this->loggerFacade = $loggerFacade;
 
             return $this->createDTOGeneratorFacade();
@@ -110,7 +110,7 @@ class DTOPlugin implements DependencyProviderInterface, ConfigurableInterface, P
     protected function createFileLocatorFactory(): FileLocatorFactoryInterface
     {
         return new FileLocatorFactory(
-            appKernel: $this->kernel,
+            pluginCollection: $this->pluginCollection,
             DTOPluginConfiguration: $this->configuration()
         );
     }

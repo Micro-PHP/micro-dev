@@ -13,33 +13,32 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpMiddleware\Tests\Unit\Business\Middleware;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\HttpMiddleware\Business\Middleware\MiddlewareLocator;
 use Micro\Plugin\HttpMiddleware\Plugin\HttpMiddlewareOrderedPluginInterface;
 use Micro\Plugin\HttpMiddleware\Plugin\HttpMiddlewarePluginInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 class MiddlewareLocatorTest extends TestCase
 {
-    /** @var KernelInterface */
-    private $kernel;
+    private PluginCollectionInterface|MockObject $pluginCollection;
 
-    /** @var MiddlewareLocator */
-    private $locator;
+    private MiddlewareLocator $locator;
 
     protected function setUp(): void
     {
-        $this->kernel = $this->createMock(KernelInterface::class);
-        $this->locator = new MiddlewareLocator($this->kernel);
+        $this->pluginCollection = $this->createMock(PluginCollectionInterface::class);
+        $this->locator = new MiddlewareLocator($this->pluginCollection);
     }
 
-    public function testLocate()
+    public function testLocate(): void
     {
         $request = Request::create('/one/two/three/1/success');
 
         $mc = $this->createMiddlewareCollection($request);
-        $this->kernel->expects($this->once())
+        $this->pluginCollection->expects($this->once())
             ->method('plugins')
             ->willReturn($mc);
 

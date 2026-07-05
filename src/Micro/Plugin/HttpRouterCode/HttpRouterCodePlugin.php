@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Micro\Plugin\HttpRouterCode;
 
 use Micro\Framework\DependencyInjection\MutableContainerInterface;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
 use Micro\Framework\BootPluginDependent\Plugin\PluginDependedInterface;
 use Micro\Plugin\HttpCore\Business\Locator\RouteLocatorInterface;
@@ -46,10 +46,10 @@ readonly class HttpRouterCodePlugin implements HttpRouteLocatorPluginInterface, 
 
     public function createLocator(): RouteLocatorInterface
     {
-        $kernel = $this->container->get(KernelInterface::class);
+        $pluginCollection = $this->container->get(PluginCollectionInterface::class);
         $httpFacade = $this->container->get(HttpFacadeInterface::class);
         // @phpstan-ignore-next-line
-        return new RouteCodeLocator($kernel, $httpFacade);
+        return new RouteCodeLocator($pluginCollection, $httpFacade);
     }
 
     /**

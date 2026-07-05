@@ -13,19 +13,15 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\DTO\Business\FileLocator;
 
-use Micro\Framework\KernelApp\AppKernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\DTO\DTOPluginConfigurationInterface;
 use Symfony\Component\Finder\Finder;
 
 readonly class FileLocator implements FileLocatorInterface
 {
-    /**
-     * @param DTOPluginConfigurationInterface $DTOPluginConfiguration
-     * @param AppKernelInterface              $appKernel
-     */
     public function __construct(
         private DTOPluginConfigurationInterface $DTOPluginConfiguration,
-        private AppKernelInterface $appKernel
+        private PluginCollectionInterface $pluginCollection
     ) {
     }
 
@@ -68,7 +64,7 @@ readonly class FileLocator implements FileLocatorInterface
      */
     protected function createPathList(): iterable
     {
-        foreach ($this->appKernel->plugins() as $plugin) {
+        foreach ($this->pluginCollection->plugins() as $plugin) {
             $path = $this->getPluginPathDefinition($plugin);
             if (empty($path)) {
                 continue;

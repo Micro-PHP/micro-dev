@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\OAuth2\Client\Provider\Locator;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 
 /**
  * @author Stanislau Komar <head.trackingsoft@gmail.com>
@@ -21,10 +21,10 @@ use Micro\Framework\Kernel\KernelInterface;
 readonly class ProviderPluginLocatorFactory implements ProviderPluginLocatorFactoryInterface
 {
     /**
-     * @param KernelInterface $kernel
+     * @param PluginCollectionInterface $pluginCollection
      */
     public function __construct(
-        private KernelInterface $kernel
+        private PluginCollectionInterface $pluginCollection
     ) {
     }
 
@@ -34,7 +34,7 @@ readonly class ProviderPluginLocatorFactory implements ProviderPluginLocatorFact
     public function create(): ProviderPluginLocatorInterface
     {
         return new ProviderPluginLocator(
-            $this->kernel,
+            $this->pluginCollection,
         );
     }
 }

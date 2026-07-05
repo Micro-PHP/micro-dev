@@ -13,9 +13,9 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpMiddleware\Tests\Unit;
 
-use Micro\Component\DependencyInjection\Autowire\ContainerAutowire;
+use Micro\Framework\Autowire\ContainerAutowire;
 use Micro\Framework\DependencyInjection\Container;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\HttpCore\Facade\HttpFacadeInterface;
 use Micro\Plugin\HttpCore\HttpCorePlugin;
 use Micro\Plugin\HttpMiddleware\Decorator\HttpMiddlewareDecorator;
@@ -36,7 +36,7 @@ class HttpMiddlewarePluginTest extends TestCase
             ->willReturn(900);
 
         $container = new ContainerAutowire(new Container());
-        $container->register(KernelInterface::class, fn () => $this->createMock(KernelInterface::class));
+        $container->register(PluginCollectionInterface::class, fn () => $this->createMock(PluginCollectionInterface::class));
         $container->register(HttpFacadeInterface::class, fn () => $this->createMock(HttpFacadeInterface::class));
 
         $this->plugin->setConfiguration($cfg);

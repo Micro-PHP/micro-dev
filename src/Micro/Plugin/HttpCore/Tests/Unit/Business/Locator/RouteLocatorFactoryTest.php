@@ -11,7 +11,7 @@
 
 namespace Micro\Plugin\HttpCore\Tests\Unit\Business\Locator;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\HttpCore\Business\Locator\RouteLocatorFactory;
 use Micro\Plugin\HttpCore\Business\Locator\RouteLocatorInterface;
 use Micro\Plugin\HttpCore\Configuration\HttpCorePluginConfigurationInterface;
@@ -22,13 +22,11 @@ class RouteLocatorFactoryTest extends TestCase
 {
     /**
      * @dataProvider dataProvider
-     *
-     * @return void
      */
-    public function testCreate(string $alias, string|null $allowedException)
+    public function testCreate(string $alias, string|null $allowedException): void
     {
         $routeLocatorFactory = new RouteLocatorFactory(
-            $this->createKernel($alias, (bool) $allowedException),
+            $this->createPluginCollection($alias, (bool) $allowedException),
             $this->createConfiguration(),
         );
 
@@ -52,9 +50,12 @@ class RouteLocatorFactoryTest extends TestCase
         return $stub;
     }
 
-    protected function createKernel(string $locatorAlias, bool $isLocatorNotFound): KernelInterface
+    protected function createPluginCollection(
+        string $locatorAlias,
+        bool $isLocatorNotFound
+    ): PluginCollectionInterface
     {
-        $stubKernel = $this->createMock(KernelInterface::class);
+        $pluginCollection = $this->createMock(PluginCollectionInterface::class);
         $stubLocator = $this->createMock(HttpRouteLocatorPluginInterface::class);
 
         $stubLocator
@@ -71,13 +72,13 @@ class RouteLocatorFactoryTest extends TestCase
                 );
         }
 
-        $stubKernel
+        $pluginCollection
             ->expects($this->once())
             ->method('plugins')
             ->with(HttpRouteLocatorPluginInterface::class)
             ->willReturn(new \ArrayObject([$stubLocator]));
 
-        return $stubKernel;
+        return $pluginCollection;
     }
 
     public static function dataProvider(): array

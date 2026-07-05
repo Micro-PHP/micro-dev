@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Micro\Plugin\HttpRouterCode\Business\Locator;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\HttpCore\Business\Locator\RouteLocatorInterface;
 use Micro\Plugin\HttpCore\Facade\HttpFacadeInterface;
 use Micro\Plugin\HttpRouterCode\Plugin\RouteProviderPluginInterface;
@@ -24,7 +24,7 @@ use Micro\Plugin\HttpRouterCode\Plugin\RouteProviderPluginInterface;
 readonly class RouteCodeLocator implements RouteLocatorInterface
 {
     public function __construct(
-        private KernelInterface $kernel,
+        private PluginCollectionInterface $pluginCollection,
         private HttpFacadeInterface $httpFacade
     ) {
     }
@@ -34,7 +34,7 @@ readonly class RouteCodeLocator implements RouteLocatorInterface
      */
     public function locate(): iterable
     {
-        $iterator = $this->kernel->plugins(RouteProviderPluginInterface::class);
+        $iterator = $this->pluginCollection->plugins(RouteProviderPluginInterface::class);
         /** @var RouteProviderPluginInterface $plugin */
         foreach ($iterator as $plugin) {
             foreach ($plugin->provideRoutes($this->httpFacade) as $route) {
