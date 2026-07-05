@@ -119,7 +119,7 @@ readonly class AutowireHelper implements AutowireHelperInterface
      *
      * @phpstan-ignore-next-line
      */
-    protected function throwAutowireException(string|array|callable|null $target, string $message, \Throwable $parent = null): void
+    protected function throwAutowireException(string|array|callable|null $target, string $message, ?\Throwable $parent = null): void
     {
         if (\is_array($target)) {
             $target = $target[0] ?? null;
