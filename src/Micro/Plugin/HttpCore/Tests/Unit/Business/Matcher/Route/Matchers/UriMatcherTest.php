@@ -12,6 +12,7 @@
 namespace Micro\Plugin\HttpCore\Tests\Unit\Business\Matcher\Route\Matchers;
 
 use Micro\Plugin\HttpCore\Business\Matcher\Route\Matchers\UriMatcher;
+use Micro\Plugin\HttpCore\Business\Route\RouteBuilder;
 use Micro\Plugin\HttpCore\Business\Route\RouteInterface;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
@@ -63,5 +64,19 @@ class UriMatcherTest extends TestCase
             ['/test/api.json', '/test/api', null, false, null],
             ['/test/api', '/test/api', null, true, null],
         ];
+    }
+
+    public function testMatchesSingleCharacterParameterInNestedRoute(): void
+    {
+        $route = (new RouteBuilder())
+            ->setName('admin_page_delete')
+            ->setUri('/admin/pages/{id}/delete')
+            ->setMethods(['POST'])
+            ->setController(static fn () => null)
+            ->build();
+        $request = Request::create('/admin/pages/2/delete', 'POST');
+
+        $this->assertTrue((new UriMatcher())->match($route, $request));
+        $this->assertSame('2', $request->request->get('id'));
     }
 }

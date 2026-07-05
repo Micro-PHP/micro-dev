@@ -74,9 +74,9 @@ class RouteBuilderTest extends TestCase
     public static function dataProvider(): array
     {
         return [
-            ['test', function () {}, '/{test}.{_format}', '/\/(.[aA-zZ0-9-_]+)\.(.[aA-zZ0-9-_]+)$/', ['POST'], null],
-            ['test', function () {}, '/{test}-{date}.{_format}', '/\/(.[aA-zZ0-9-_]+)-(.[aA-zZ0-9-_]+)\.(.[aA-zZ0-9-_]+)$/', ['POST'], null],
-            [null, function () {}, '/{test}.{_format}', '/\/(.[aA-zZ0-9-_]+)\.(.[aA-zZ0-9-_]+)$/', null, null],
+            ['test', function () {}, '/{test}.{_format}', '/^\/([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)$/', ['POST'], null],
+            ['test', function () {}, '/{test}-{date}.{_format}', '/^\/([a-zA-Z0-9_-]+)-([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)$/', ['POST'], null],
+            [null, function () {}, '/{test}.{_format}', '/^\/([a-zA-Z0-9_-]+)\.([a-zA-Z0-9_-]+)$/', null, null],
             ['test', null, '/{test}.{_format}', null, null, RouteInvalidConfigurationException::class],
             ['test', function () {}, '/test', null, null, null],
             ['test', null, null, null, null, RouteInvalidConfigurationException::class],
