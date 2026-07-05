@@ -44,7 +44,7 @@ class TemplateLoader implements LoaderInterface
      *
      * @throws LoaderError
      */
-    protected function registerTemplates(FilesystemLoader $loader, array $paths, string $namespace = null): void
+    protected function registerTemplates(FilesystemLoader $loader, array $paths, ?string $namespace = null): void
     {
         if (null === $namespace) {
             $namespace = FilesystemLoader::MAIN_NAMESPACE;

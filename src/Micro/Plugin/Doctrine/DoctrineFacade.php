@@ -28,7 +28,7 @@ class DoctrineFacade implements DoctrineFacadeInterface
         $this->managerPool = null;
     }
 
-    public function getManager(string $name = null): EntityManagerInterface
+    public function getManager(?string $name = null): EntityManagerInterface
     {
         if (!$name) {
             $name = DoctrinePluginConfigurationInterface::MANAGER_DEFAULT;
