@@ -12,6 +12,7 @@
 namespace Micro\Framework\Kernel;
 
 use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
+use Micro\Framework\Kernel\Plugin\PluginRegistry;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Container\NotFoundExceptionInterface;
@@ -20,10 +21,7 @@ class Kernel implements KernelInterface
 {
     private bool $isStarted;
 
-    /**
-     * @var array<class-string, object>
-     */
-    private array $plugins;
+    private readonly PluginRegistry $pluginRegistry;
 
     /**
      * @param class-string[]              $pluginCollection
@@ -32,10 +30,11 @@ class Kernel implements KernelInterface
     public function __construct(
         private readonly array $pluginCollection,
         private array $pluginBootLoaderCollection,
-        private readonly ContainerInterface $container
+        private readonly ContainerInterface $container,
+        ?PluginRegistry $pluginRegistry = null
     ) {
         $this->isStarted = false;
-        $this->plugins = [];
+        $this->pluginRegistry = $pluginRegistry ?? new PluginRegistry();
     }
 
     public function addBootLoader(PluginBootLoaderInterface $bootLoader): self
@@ -86,7 +85,7 @@ class Kernel implements KernelInterface
      */
     public function loadPlugin(string $pluginClass): void
     {
-        if (\array_key_exists($pluginClass, $this->plugins)) {
+        if ($this->pluginRegistry->has($pluginClass)) {
             return;
         }
 
@@ -96,7 +95,7 @@ class Kernel implements KernelInterface
                 $bootLoader->boot($plugin);
             }
 
-            $this->plugins[$pluginClass] = $plugin;
+            $this->pluginRegistry->add($pluginClass, $plugin);
         } catch (NotFoundExceptionInterface|ContainerExceptionInterface $e) {
             // Silently skip for now
         }
@@ -107,11 +106,7 @@ class Kernel implements KernelInterface
      */
     public function plugins(?string $pluginInterface = null): \Traversable
     {
-        foreach ($this->plugins as $plugin) {
-            if (!$pluginInterface || ($plugin instanceof $pluginInterface)) {
-                yield $plugin;
-            }
-        }
+        yield from $this->pluginRegistry->plugins($pluginInterface);
     }
 
     protected function loadPlugins(): void

@@ -43,6 +43,10 @@ class KernelTest extends TestCase
         }
 
         $this->container = new Container();
+        $this->container->register(
+            \stdClass::class,
+            static fn (): object => new \stdClass()
+        );
 
         $this->kernel = new Kernel(
             $plugins,

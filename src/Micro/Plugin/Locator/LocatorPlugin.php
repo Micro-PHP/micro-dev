@@ -12,8 +12,8 @@
 namespace Micro\Plugin\Locator;
 
 use Micro\Framework\DependencyInjection\MutableContainerInterface;
-use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\BootDependency\Plugin\DependencyProviderInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\Locator\Facade\LocatorFacade;
 use Micro\Plugin\Locator\Facade\LocatorFacadeInterface;
 use Micro\Plugin\Locator\Locator\LocatorFactory;
@@ -21,28 +21,26 @@ use Micro\Plugin\Locator\Locator\LocatorFactoryInterface;
 
 class LocatorPlugin implements DependencyProviderInterface
 {
-    private ?KernelInterface $kernel = null;
-
     public function provideDependencies(MutableContainerInterface $container): void
     {
         $container->register(LocatorFacadeInterface::class, function (
-            KernelInterface $kernel
+            PluginCollectionInterface $pluginCollection
         ) {
-            $this->kernel = $kernel;
-
-            return $this->createLocatorFacade();
+            return $this->createLocatorFacade($pluginCollection);
         });
     }
 
-    protected function createLocatorFacade(): LocatorFacadeInterface
-    {
+    protected function createLocatorFacade(
+        PluginCollectionInterface $pluginCollection
+    ): LocatorFacadeInterface {
         return new LocatorFacade(
-            $this->createLocatorFactory()
+            $this->createLocatorFactory($pluginCollection)
         );
     }
 
-    protected function createLocatorFactory(): LocatorFactoryInterface
-    {
-        return new LocatorFactory($this->kernel);
+    protected function createLocatorFactory(
+        PluginCollectionInterface $pluginCollection
+    ): LocatorFactoryInterface {
+        return new LocatorFactory($pluginCollection);
     }
 }

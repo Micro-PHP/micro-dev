@@ -50,8 +50,11 @@ class KernelBuilderTest extends TestCase
         $this->assertEquals($container, $kernel->container());
     }
 
-    public function testBootLoaders()
+    public function testBootLoaders(): void
     {
+        $container = new Container();
+        $container->register(\stdClass::class, static fn (): object => new \stdClass());
+
         $kernel = $this->builder
             ->setApplicationPlugins([
                 \stdClass::class,
@@ -61,6 +64,7 @@ class KernelBuilderTest extends TestCase
                 $this->createBootLoader(),
             ])
             ->addBootLoader($this->createBootLoader())
+            ->setContainer($container)
             ->build()
         ;
 

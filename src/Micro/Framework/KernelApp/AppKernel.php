@@ -15,6 +15,7 @@ use Micro\Framework\Autowire\Builder\AutowireContainerBuilder;
 use Micro\Framework\Autowire\Builder\AutowireContainerBuilderInterface;
 use Micro\Framework\Autowire\Definition\AutowiredClassDefinition;
 use Micro\Framework\DependencyInjection\MutableContainerInterface;
+use Micro\Framework\DependencyInjection\Definition\ServiceDefinition;
 use Micro\Framework\BootConfiguration\Boot\ConfigurationProviderBootLoader;
 use Micro\Framework\BootPluginDependent\Boot\DependedPluginsBootLoader;
 use Micro\Framework\BootDependency\Boot\DependencyProviderBootLoader;
@@ -22,6 +23,8 @@ use Micro\Framework\BootConfiguration\Configuration\ApplicationConfigurationInte
 use Micro\Framework\Kernel\KernelBuilder;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
+use Micro\Framework\Kernel\Plugin\PluginRegistry;
 use Micro\Framework\KernelApp\Business\KernelActionProcessorInterface;
 use Micro\Framework\KernelApp\Business\KernelRunActionProcessor;
 use Micro\Framework\KernelApp\Business\KernelTerminateActionProcessor;
@@ -146,7 +149,12 @@ class AppKernel implements AppKernelInterface
         ]);
         $this->plugins = [];
 
+        $pluginRegistry = new PluginRegistry();
         $containerBuilder = $this->createContainerBuilder();
+        $containerBuilder->service(new ServiceDefinition(
+            PluginCollectionInterface::class,
+            $pluginRegistry
+        ));
         foreach ($plugins as $pluginClass) {
             $containerBuilder->autowiredClass(new AutowiredClassDefinition(
                 id: $pluginClass,
@@ -158,6 +166,7 @@ class AppKernel implements AppKernelInterface
         return $this
             ->createKernelBuilder()
             ->setContainer($container)
+            ->setPluginRegistry($pluginRegistry)
             ->addBootLoaders($this->createBootLoaderCollection($container))
             ->setApplicationPlugins($plugins)
             ->build();

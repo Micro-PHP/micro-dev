@@ -13,6 +13,7 @@ namespace Micro\Framework\Kernel;
 
 use Micro\Framework\DependencyInjection\Builder\ContainerBuilder;
 use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
+use Micro\Framework\Kernel\Plugin\PluginRegistry;
 use Psr\Container\ContainerInterface;
 
 class KernelBuilder
@@ -29,11 +30,14 @@ class KernelBuilder
 
     private ?ContainerInterface $container;
 
+    private ?PluginRegistry $pluginRegistry;
+
     public function __construct()
     {
         $this->pluginCollection = [];
         $this->bootLoaderPluginCollection = [];
         $this->container = null;
+        $this->pluginRegistry = null;
     }
 
     /**
@@ -84,6 +88,13 @@ class KernelBuilder
         return $this;
     }
 
+    public function setPluginRegistry(PluginRegistry $pluginRegistry): self
+    {
+        $this->pluginRegistry = $pluginRegistry;
+
+        return $this;
+    }
+
     protected function container(): ContainerInterface
     {
         return $this->container ?? (new ContainerBuilder())->build();
@@ -98,6 +109,7 @@ class KernelBuilder
             $this->pluginCollection,
             $this->bootLoaderPluginCollection,
             $this->container(),
+            $this->pluginRegistry,
         );
     }
 }

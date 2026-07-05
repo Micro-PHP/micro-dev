@@ -15,7 +15,7 @@ namespace Micro\Framework\KernelApp\Tests\Unit;
 
 use Micro\Framework\Autowire\Builder\AutowireContainerBuilder;
 use Micro\Framework\Autowire\Builder\AutowireContainerBuilderInterface;
-use Micro\Framework\DependencyInjection\Container;
+use Micro\Framework\DependencyInjection\MutableContainerInterface;
 use Micro\Framework\Kernel\KernelInterface;
 use Micro\Framework\Kernel\Plugin\PluginBootLoaderInterface;
 use Micro\Framework\KernelApp\AppKernel;
@@ -48,7 +48,7 @@ class AppKernelTest extends TestCase
 
         $app->run();
 
-        $this->assertInstanceOf(Container::class, $app->container());
+        $this->assertInstanceOf(MutableContainerInterface::class, $app->container());
 
         $app->terminate();
     }
@@ -118,7 +118,7 @@ class AppKernelTest extends TestCase
         $app = new AppKernel();
 
         $this->expectException(\RuntimeException::class);
-        $this->expectExceptionMessage('Method Micro\Kernel\App\AppKernel::plugins can not be called before Micro\Framework\Kernel\KernelInterface::run() execution.');
+        $this->expectExceptionMessage('Method Micro\Framework\KernelApp\AppKernel::plugins can not be called before Micro\Framework\Kernel\KernelInterface::run() execution.');
 
         $this->assertNotNull($app->plugins());
     }

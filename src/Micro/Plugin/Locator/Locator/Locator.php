@@ -11,7 +11,7 @@
 
 namespace Micro\Plugin\Locator\Locator;
 
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Symfony\Component\Finder\Finder;
 
 class Locator implements LocatorInterface
@@ -22,7 +22,7 @@ class Locator implements LocatorInterface
     private array $locatedClasses;
 
     public function __construct(
-        private readonly KernelInterface $kernel
+        private readonly PluginCollectionInterface $pluginCollection
     ) {
         $this->locatedClasses = [];
     }
@@ -35,7 +35,7 @@ class Locator implements LocatorInterface
             return;
         }
 
-        foreach ($this->kernel->plugins() as $plugin) {
+        foreach ($this->pluginCollection->plugins() as $plugin) {
             $reflection = $this->createReflectionClass($plugin);
             foreach ($this->getPluginClasses($reflection) as $pluginInternalClassName) {
                 $pluginClassReflection = $this->createReflectionClass($pluginInternalClassName);

@@ -14,7 +14,7 @@ declare(strict_types=1);
 namespace Micro\Plugin\Locator\Tests\Unit;
 
 use Micro\Framework\KernelApp\AppKernel;
-use Micro\Framework\Kernel\KernelInterface;
+use Micro\Framework\Kernel\Plugin\PluginCollectionInterface;
 use Micro\Plugin\EventEmitter\Business\Locator\EventListenerClassLocatorInterface;
 use Micro\Plugin\EventEmitter\EventEmitterPlugin;
 use Micro\Plugin\Locator\Facade\LocatorFacadeInterface;
@@ -51,7 +51,7 @@ class LocatorPluginTest extends TestCase
 
     public function testPluginClassDiscoveryExcludesTestsDirectories(): void
     {
-        $locator = new class($this->createMock(KernelInterface::class)) extends Locator {
+        $locator = new class($this->createMock(PluginCollectionInterface::class)) extends Locator {
             /**
              * @return list<class-string>
              */
