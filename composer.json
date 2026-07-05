@@ -48,7 +48,8 @@
         "phpunit/phpunit": "^10.1",
         "symfony/expression-language": "^5.4 || ^6",
         "symfony/intl": "^5.4 || ^6",
-        "symfony/var-dumper": "^5.4 || ^6"
+        "symfony/var-dumper": "^5.4 || ^6",
+        "rector/rector": "^2.5"
     },
     "replace": {
         "micro/kernel": "self.version"
